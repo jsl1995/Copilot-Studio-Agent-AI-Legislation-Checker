@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{AGENT_NAME}} - AI compliance assessment</title>
+  <style>
+    :root {
+      --brand-foreground: #0f6cbd;
+      --brand-background: #e8f3fc;
+      --brand-hover: #115ea3;
+      --neutral-foreground-1: #242424;
+      --neutral-foreground-2: #616161;
+      --neutral-foreground-3: #707070;
+      --neutral-background-1: #ffffff;
+      --neutral-background-2: #fafafa;
+      --neutral-background-3: #f5f5f5;
+      --neutral-stroke-1: #d1d1d1;
+      --neutral-stroke-2: #e1e1e1;
+      --high: #b10e1e;
+      --high-background: #fde7e9;
+      --medium: #8a5700;
+      --medium-background: #fff4ce;
+      --low: #107c10;
+      --low-background: #dff6dd;
+      --advisory: #5c2e91;
+      --advisory-background: #f1e9f9;
+      --shadow-2: 0 1px 2px rgba(0, 0, 0, .12);
+      --shadow-4: 0 2px 4px rgba(0, 0, 0, .14);
+      color-scheme: light;
+      font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      color: var(--neutral-foreground-1);
+      background: var(--neutral-background-3);
+    }
+
+    * { box-sizing: border-box; }
+    body { margin: 0; line-height: 1.45; }
+    a { color: var(--brand-foreground); }
+    a:hover { color: var(--brand-hover); }
+    .app-shell { max-width: 1440px; margin: 0 auto; padding: 24px; }
+    .report-header, .panel, .finding, .data-table-wrap { background: var(--neutral-background-1); border: 1px solid var(--neutral-stroke-2); border-radius: 6px; box-shadow: var(--shadow-2); }
+    .report-header { padding: 24px; }
+    .eyebrow { color: var(--neutral-foreground-2); font-size: .78rem; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
+    h1 { margin: 4px 0 8px; font-size: clamp(1.65rem, 3vw, 2.25rem); line-height: 1.15; }
+    h2 { margin: 0 0 12px; font-size: 1.35rem; }
+    h3 { margin: 0 0 8px; font-size: 1rem; }
+    .meta { display: flex; flex-wrap: wrap; gap: 8px 20px; color: var(--neutral-foreground-2); font-size: .9rem; }
+    .badge { display: inline-flex; align-items: center; min-height: 24px; padding: 2px 8px; border-radius: 4px; background: var(--brand-background); color: #084b83; font-weight: 600; }
+    .disclaimer { margin: 18px 0 0; padding: 12px 14px; border-left: 3px solid var(--brand-foreground); background: var(--neutral-background-2); color: var(--neutral-foreground-2); font-size: .9rem; }
+    .dashboard-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; margin: 16px 0; }
+    .tile { min-height: 112px; padding: 14px; border: 1px solid var(--neutral-stroke-2); border-top: 4px solid var(--brand-foreground); border-radius: 6px; background: var(--neutral-background-1); box-shadow: var(--shadow-2); text-align: left; }
+    .tile[data-severity="high"] { border-top-color: var(--high); background: var(--high-background); }
+    .tile[data-severity="medium"] { border-top-color: var(--medium); background: var(--medium-background); }
+    .tile[data-severity="low"] { border-top-color: var(--low); background: var(--low-background); }
+    .tile[data-severity="advisory"] { border-top-color: var(--advisory); background: var(--advisory-background); }
+    .tile-label { display: block; color: var(--neutral-foreground-2); font-size: .84rem; font-weight: 600; }
+    .tile-count { display: block; margin-top: 4px; font-size: 2rem; font-weight: 700; line-height: 1; }
+    .tile-action { display: block; margin-top: 10px; color: var(--brand-foreground); font-size: .82rem; }
+    .tabs { margin-top: 18px; }
+    [role="tablist"] { display: flex; gap: 2px; overflow-x: auto; border-bottom: 1px solid var(--neutral-stroke-1); }
+    [role="tab"] { flex: 0 0 auto; padding: 11px 14px; border: 0; border-bottom: 2px solid transparent; background: transparent; color: var(--neutral-foreground-2); cursor: pointer; font: inherit; font-weight: 600; }
+    [role="tab"]:hover, [role="tab"]:focus-visible { background: var(--neutral-background-2); color: var(--neutral-foreground-1); }
+    [role="tab"][aria-selected="true"] { border-bottom-color: var(--brand-foreground); color: var(--brand-foreground); }
+    [role="tabpanel"] { padding-top: 16px; }
+    .panel { padding: 20px; }
+    .summary-layout { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; }
+    .finding-list { display: grid; gap: 12px; }
+    .finding { padding: 16px; border-left: 4px solid var(--brand-foreground); }
+    .finding[data-severity="high"] { border-left-color: var(--high); }
+    .finding[data-severity="medium"] { border-left-color: var(--medium); }
+    .finding[data-severity="low"] { border-left-color: var(--low); }
+    .finding[data-severity="advisory"] { border-left-color: var(--advisory); }
+    .finding-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px; }
+    .severity-label { font-size: .78rem; font-weight: 700; text-transform: uppercase; }
+    .severity-label.high { color: var(--high); }
+    .severity-label.medium { color: var(--medium); }
+    .severity-label.low { color: var(--low); }
+    .severity-label.advisory { color: var(--advisory); }
+    .finding-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 18px; margin-top: 12px; }
+    .field-label { display: block; color: var(--neutral-foreground-2); font-size: .78rem; font-weight: 600; }
+    .field-value { display: block; overflow-wrap: anywhere; }
+    .data-table-wrap { overflow-x: auto; }
+    table { width: 100%; min-width: 720px; border-collapse: collapse; }
+    th, td { padding: 10px 12px; border-bottom: 1px solid var(--neutral-stroke-2); text-align: left; vertical-align: top; }
+    th { background: var(--neutral-background-3); color: var(--neutral-foreground-2); font-size: .8rem; font-weight: 700; }
+    tr:last-child td { border-bottom: 0; }
+    .stack { display: grid; gap: 12px; }
+    .empty-state { padding: 18px; border: 1px dashed var(--neutral-stroke-1); color: var(--neutral-foreground-2); }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+    @media (max-width: 980px) { .dashboard-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } .summary-layout { grid-template-columns: 1fr; } }
+    @media (max-width: 620px) { .app-shell { padding: 12px; } .report-header, .panel { padding: 16px; } .dashboard-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .finding-fields { grid-template-columns: 1fr; } }
+    @media print { body { background: #fff; } .app-shell { max-width: none; padding: 0; } .dashboard-grid { grid-template-columns: repeat(5, 1fr); } [role="tablist"] { display: none; } [role="tabpanel"][hidden] { display: block !important; } .panel, .finding, .report-header { box-shadow: none; break-inside: avoid; } }
+  </style>
+</head>
+<body>
+  <main class="app-shell">
+    <header class="report-header">
+      <span class="eyebrow">AI compliance assessment</span>
+      <h1>{{AGENT_NAME}}</h1>
+      <div class="meta">
+        <span>Assessed {{ASSESSED_DATE}}</span>
+        <span>Jurisdictions: {{JURISDICTIONS}}</span>
+        <span>Regimes: {{REGIMES}}</span>
+        <span class="badge">{{EVIDENCE_BOUNDARY}}</span>
+      </div>
+      <p class="disclaimer">This is a technical compliance assessment, not legal advice. Findings should be validated by qualified legal counsel and the organisation's DPO before being relied upon.</p>
+    </header>
+
+    <section class="dashboard-grid" aria-label="Finding summary">
+      <button class="tile" data-severity="high" type="button" data-target-tab="findings" data-filter="high">
+        <span class="tile-label">High</span><span class="tile-count">{{HIGH_COUNT}}</span><span class="tile-action">View findings</span>
+      </button>
+      <button class="tile" data-severity="medium" type="button" data-target-tab="findings" data-filter="medium">
+        <span class="tile-label">Medium</span><span class="tile-count">{{MEDIUM_COUNT}}</span><span class="tile-action">View findings</span>
+      </button>
+      <button class="tile" data-severity="low" type="button" data-target-tab="findings" data-filter="low">
+        <span class="tile-label">Low</span><span class="tile-count">{{LOW_COUNT}}</span><span class="tile-action">View findings</span>
+      </button>
+      <button class="tile" data-severity="advisory" type="button" data-target-tab="findings" data-filter="advisory">
+        <span class="tile-label">Advisory / future readiness</span><span class="tile-count">{{ADVISORY_COUNT}}</span><span class="tile-action">View findings</span>
+      </button>
+      <button class="tile" type="button" data-target-tab="scope">
+        <span class="tile-label">Evidence required</span><span class="tile-count">{{EVIDENCE_COUNT}}</span><span class="tile-action">View evidence gaps</span>
+      </button>
+    </section>
+
+    <section class="tabs" aria-label="Assessment sections">
+      <div role="tablist" aria-label="Assessment sections">
+        <button role="tab" id="tab-executive" aria-controls="panel-executive" aria-selected="true" tabindex="0" data-tab="executive">Executive summary</button>
+        <button role="tab" id="tab-scope" aria-controls="panel-scope" aria-selected="false" tabindex="-1" data-tab="scope">Scope &amp; evidence</button>
+        <button role="tab" id="tab-findings" aria-controls="panel-findings" aria-selected="false" tabindex="-1" data-tab="findings">Findings</button>
+        <button role="tab" id="tab-data" aria-controls="panel-data" aria-selected="false" tabindex="-1" data-tab="data">Personal-data map</button>
+        <button role="tab" id="tab-remediation" aria-controls="panel-remediation" aria-selected="false" tabindex="-1" data-tab="remediation">Remediation</button>
+        <button role="tab" id="tab-matrix" aria-controls="panel-matrix" aria-selected="false" tabindex="-1" data-tab="matrix">Coverage matrix</button>
+      </div>
+
+      <section role="tabpanel" id="panel-executive" aria-labelledby="tab-executive" data-panel="executive">
+        <div class="summary-layout">
+          <article class="panel"><h2>Executive summary</h2><div class="stack">{{EXECUTIVE_SUMMARY}}</div></article>
+          <aside class="panel"><h2>Classification</h2><div class="stack">{{CLASSIFICATION_SUMMARY}}</div></aside>
+        </div>
+      </section>
+      <section role="tabpanel" id="panel-scope" aria-labelledby="tab-scope" data-panel="scope" hidden>
+        <article class="panel"><h2>Scope, assumptions &amp; evidence</h2><div class="stack">{{SCOPE_AND_EVIDENCE}}</div></article>
+      </section>
+      <section role="tabpanel" id="panel-findings" aria-labelledby="tab-findings" data-panel="findings" hidden>
+        <div class="panel"><h2>Findings</h2><div class="finding-list">{{FINDINGS}}</div></div>
+      </section>
+      <section role="tabpanel" id="panel-data" aria-labelledby="tab-data" data-panel="data" hidden>
+        <article class="panel"><h2>Personal-data map</h2><div class="data-table-wrap">{{PERSONAL_DATA_MAP}}</div></article>
+      </section>
+      <section role="tabpanel" id="panel-remediation" aria-labelledby="tab-remediation" data-panel="remediation" hidden>
+        <article class="panel"><h2>Remediation plan</h2><div class="stack">{{REMEDIATION}}</div></article>
+      </section>
+      <section role="tabpanel" id="panel-matrix" aria-labelledby="tab-matrix" data-panel="matrix" hidden>
+        <article class="panel"><h2>Coverage matrix</h2><div class="data-table-wrap">{{COVERAGE_MATRIX}}</div></article>
+      </section>
+    </section>
+  </main>
+
+  <script>
+    (() => {
+      const tabs = [...document.querySelectorAll('[role="tab"]')];
+      const panels = [...document.querySelectorAll('[role="tabpanel"]')];
+      const findings = [...document.querySelectorAll('.finding[data-severity]')];
+      const filterFindings = (filter) => {
+        findings.forEach((finding) => { finding.hidden = Boolean(filter) && finding.dataset.severity !== filter; });
+      };
+      const activate = (name, updateHash = true) => {
+        tabs.forEach((tab) => {
+          const selected = tab.dataset.tab === name;
+          tab.setAttribute('aria-selected', String(selected));
+          tab.tabIndex = selected ? 0 : -1;
+        });
+        panels.forEach((panel) => { panel.hidden = panel.dataset.panel !== name; });
+        if (name !== 'findings') filterFindings(null);
+        if (updateHash) history.replaceState(null, '', `#${name}`);
+      };
+      tabs.forEach((tab, index) => {
+        tab.addEventListener('click', () => activate(tab.dataset.tab));
+        tab.addEventListener('keydown', (event) => {
+          if (!['ArrowRight', 'ArrowLeft', 'Home', 'End'].includes(event.key)) return;
+          event.preventDefault();
+          const next = event.key === 'Home' ? 0 : event.key === 'End' ? tabs.length - 1 : (index + (event.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length;
+          tabs[next].focus();
+          activate(tabs[next].dataset.tab);
+        });
+      });
+      document.querySelectorAll('[data-target-tab]').forEach((tile) => tile.addEventListener('click', () => {
+        filterFindings(tile.dataset.filter || null);
+        activate(tile.dataset.targetTab);
+        document.getElementById('panel-' + tile.dataset.targetTab)?.scrollIntoView({ block: 'start' });
+      }));
+      const initial = location.hash.slice(1);
+      activate(tabs.some((tab) => tab.dataset.tab === initial) ? initial : 'executive', false);
+    })();
+  </script>
+</body>
+</html>

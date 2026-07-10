@@ -1,0 +1,130 @@
+{
+  "version": 1,
+  "purpose": "Regression scenarios for jurisdiction, applicability, severity, and evidence handling.",
+  "cases": [
+    {
+      "id": "uk-only-no-eu-use",
+      "scenario": "A UK-established organisation operates an agent only for authenticated UK employees. Access is restricted to the UK tenant and output is not used in the EU.",
+      "expected": [
+        "Assess UK law and guidance.",
+        "Do not state that the EU AI Act or EU GDPR applies on the supplied facts.",
+        "Record EU exposure as out of scope unless contrary facts emerge."
+      ],
+      "must_not": [
+        "Apply EU law solely because the organisation is in the UK.",
+        "Use technical internet reachability as proof of EU use."
+      ]
+    },
+    {
+      "id": "uk-operator-eu-users",
+      "scenario": "A UK-established organisation intentionally offers an agent to customers in France and Germany and uses the output to fulfil their requests.",
+      "expected": [
+        "Assess UK requirements.",
+        "Apply the EU AI Act Article 2 and EU GDPR Article 3 tests separately.",
+        "Explain which facts establish EU scope for each instrument."
+      ],
+      "must_not": [
+        "Treat AI Act and GDPR territorial scope as a single test."
+      ]
+    },
+    {
+      "id": "article-50-before-commencement",
+      "scenario": "An assessment dated 10 July 2026 finds no explicit AI disclosure in an EU-facing low-risk chatbot whose AI nature is not otherwise obvious.",
+      "expected": [
+        "Identify Article 50 as a future obligation applying from 2 August 2026.",
+        "Report future-readiness remediation rather than a current Article 50 breach.",
+        "Assess any independently applicable current transparency law separately."
+      ],
+      "must_not": [
+        "Describe the missing disclosure as a current Article 50 breach."
+      ]
+    },
+    {
+      "id": "article-50-obvious-interaction",
+      "scenario": "After 2 August 2026, an EU-facing experience is visually and textually presented throughout as an AI assistant but does not use the exact sentence 'I am an AI'.",
+      "expected": [
+        "Apply the reasonably well-informed, observant, and circumspect person exception.",
+        "Assess the complete user experience rather than requiring an exact phrase.",
+        "Document uncertainty if the interface evidence is unavailable."
+      ],
+      "must_not": [
+        "Automatically issue a High finding because one exact greeting phrase is absent."
+      ]
+    },
+    {
+      "id": "anonymous-public-faq",
+      "scenario": "A public anonymous agent answers opening-hour questions, has no actions or restricted knowledge, and asks for no structured personal data.",
+      "expected": [
+        "Treat no authentication as a supported design requiring contextual risk assessment.",
+        "Request transcript and host-page evidence because free-text messages may still contain personal data.",
+        "Do not infer an Article 32 breach from authentication mode alone."
+      ],
+      "must_not": [
+        "Automatically rate no authentication as High."
+      ]
+    },
+    {
+      "id": "privileged-action-maker-credentials",
+      "scenario": "An anonymous public agent can invoke a Dataverse action using a maker connection that can read unrestricted customer records.",
+      "expected": [
+        "Raise a High technical security finding or go-live blocker.",
+        "Distinguish conversation authentication from downstream connector authorization.",
+        "Require least privilege and an appropriate user or service authorization model."
+      ],
+      "must_not": [
+        "Treat authored topic guardrails as proof of authorization."
+      ]
+    },
+    {
+      "id": "yaml-only-missing-external-evidence",
+      "scenario": "Only unpacked YAML is supplied. It contains no privacy notice, retention period, or transcript configuration.",
+      "expected": [
+        "Label the report as YAML-only and incomplete.",
+        "Record host-page notice, transcript, retention, and tenant policy as evidence requests.",
+        "For absence checks, list files and configuration surfaces inspected rather than inventing a line citation."
+      ],
+      "must_not": [
+        "Confirm that no privacy notice exists anywhere.",
+        "Severity-rate unavailable tenant evidence as a source-code defect."
+      ]
+    },
+    {
+      "id": "non-high-risk-article-26",
+      "scenario": "An EU-facing customer-service chatbot is documented as non-high-risk and does not make or materially influence Annex I or III decisions.",
+      "expected": [
+        "Do not apply Article 26 high-risk deployer duties as mandatory.",
+        "Present comparable oversight controls as good practice when useful.",
+        "Label the basis as guidance or technical control rather than binding Article 26 law."
+      ],
+      "must_not": [
+        "Create an Article 26 breach solely because a non-high-risk chatbot lacks high-risk controls."
+      ]
+    },
+    {
+      "id": "dpia-contextual-test",
+      "scenario": "An internal low-volume FAQ agent processes ordinary employee questions but performs no evaluation, profiling, monitoring, sensitive-data processing, or significant decisions.",
+      "expected": [
+        "Apply the likely-high-risk DPIA test and regulator criteria.",
+        "Request the organisation's screening decision or rationale.",
+        "Do not assert that AI use alone makes a DPIA mandatory."
+      ],
+      "must_not": [
+        "State that every AI system processing personal data requires a DPIA."
+      ]
+    },
+    {
+      "id": "html-dashboard-output",
+      "scenario": "The assessment runtime can create files and is asked to produce the compliance report.",
+      "expected": [
+        "Create a self-contained HTML report using the Fluent UI-style template.",
+        "Show High, Medium, Low, Advisory/future readiness, and Evidence required counts in that order.",
+        "Provide accessible tabs for executive summary, scope/evidence, findings, personal-data map, remediation, and coverage matrix.",
+        "Keep a Markdown fallback only when HTML generation is unavailable."
+      ],
+      "must_not": [
+        "Depend on a CDN, remote font, external JavaScript bundle, or colour alone to communicate severity.",
+        "Hide the disclaimer, findings, or evidence limitations behind a hover-only interaction."
+      ]
+    }
+  ]
+}

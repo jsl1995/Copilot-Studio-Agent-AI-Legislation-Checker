@@ -4,14 +4,18 @@ An agent skill that assesses a **Microsoft Copilot Studio agent** for compliance
 
 ## What it does
 
-1. **Asks which region(s) the agent will operate in** — UK, EU, UK + EU, or any other jurisdiction (other regions are researched live via web search rather than from stored reference material).
-   - UK-facing agents are **always also assessed against EU law**: the EU AI Act (Art 2(1)(c)) and EU GDPR (Art 3(2)) apply extraterritorially where the agent's output is used in the EU or it serves EU users. These items are reported under an explicit *"EU law applying extraterritorially"* heading.
-2. **Inventories the agent source** — `agent.mcs.yml` instructions, `settings.mcs.yml` (auth mode, content moderation, generative actions…), topics, actions, variables and connection references — and builds a personal-data map of everything the agent collects and where it goes.
+1. **Establishes jurisdiction from operational facts** — where the organisation is established, which users are targeted, where output is used, and whether access is geographically restricted. EU AI Act and GDPR extraterritorial scope are tested separately rather than inferred from UK operation alone.
+2. **Inventories source and external evidence** — `agent.mcs.yml`, settings, topics, actions, variables and connections, plus available tenant/runtime controls such as transcripts, authentication, data policies, connector credentials, channels and retention. It labels YAML-only assessments as incomplete.
 3. **Classifies the agent** under the EU AI Act (provider vs deployer role, prohibited / high-risk / limited / minimal tier) and the UK's five cross-sector AI principles.
-4. **Assesses a requirement catalogue** spanning the EU AI Act, UK AI principles, EU/UK GDPR & DPA 2018 (including automated decision-making as amended by the Data (Use and Access) Act 2025), consumer & equality law, and platform technical controls.
-5. **Outputs a report** with:
-   - 🔴 **High** / 🟠 **Medium** / 🟡 **Low** findings, each citing the specific legislative provision (instrument + article/section) with a link to the official source (EUR-Lex, legislation.gov.uk, ICO), the YAML evidence as `file:line`, a remediation, and an owner (YAML fix vs organisational action)
-   - a separate list of items requiring organisational evidence (DPIA, privacy notice, retention schedule…)
+4. **Applies requirement gates** across the EU AI Act, UK AI principles, EU/UK GDPR & DPA 2018, consumer and equality law, and platform controls. Each item records its basis type, applicability, effective status, and evidence status before it is scored.
+5. **Outputs a self-contained Fluent UI-style HTML dashboard** with:
+   - a first-viewport header and severity tiles in the order High, Medium, Low, followed by Advisory / future readiness and Evidence required
+   - accessible tabs for Executive summary, Scope & evidence, Findings, Personal-data map, Remediation, and Coverage matrix
+   - responsive finding cards, evidence states, official links, and a print-friendly layout
+   - a Markdown fallback only when HTML generation is unavailable
+   - **High / Medium / Low** findings for current binding-law or material technical risks, with separate **Advisory / future readiness** items
+   - a basis type for every item: binding law, future obligation, regulatory guidance, or technical control
+   - separate tenant/runtime and organisational evidence requests rather than treating unavailable external controls as YAML defects
    - a coverage-matrix appendix as the audit trail that every in-scope requirement was checked
 
 > ⚠️ **Disclaimer:** this produces a technical compliance assessment, not legal advice. Findings should be validated by qualified legal counsel and your DPO before being relied upon.
@@ -23,6 +27,13 @@ SKILL.md                        # the skill definition (Agent Skills format)
 resources/
   eu-legislation.md             # EU AI Act, EU GDPR, UCPD, EAA — with EUR-Lex links
   uk-legislation.md             # UK AI principles, UK GDPR/DPA 2018, DUAA 2025, Equality Act, DMCC — with legislation.gov.uk/ICO links
+  copilot-studio-controls.md    # Runtime evidence surfaces and Microsoft Learn links
+assets/
+  report-template.html          # Self-contained Fluent UI-style dashboard template
+evals/
+  cases.json                    # Regression scenarios for scope, applicability, severity and evidence
+scripts/
+  validate-skill.ps1           # Deterministic content-contract checks
 ```
 
 ## Prerequisite: clone your agent locally
@@ -80,7 +91,7 @@ and follow the prompts (environment selection → agent selection → local fold
 
    or just ask naturally: *"Run an AI compliance review of this agent."*
 
-4. Answer the region question when prompted, then review the report. The skill will offer to save it as `ai-compliance-report.md` and to implement the YAML-level fixes (e.g. adding an AI-disclosure message to the greeting topic).
+4. Answer the jurisdiction and operational-scope questions when prompted, then review the HTML dashboard. The skill will offer to save it as `ai-compliance-report.html`; it only uses `ai-compliance-report.md` as a fallback or companion when requested.
 
 ## Running the skill in GitHub Copilot
 
@@ -112,11 +123,11 @@ Notes for Copilot users:
 
 | Severity | Finding | Legislation |
 |---|---|---|
-| 🔴 High | No "I am an AI" disclosure in the greeting topic | EU AI Act, Art 50(1) |
-| 🔴 High | Placeholder escalation address (`test@...`) — no working redress route | UK principle 5 (contestability & redress) |
-| 🟠 Medium | `contentModeration: Low` on a public-facing agent | UK principle 1 (safety) |
-| 🟠 Medium | Automated out-of-coverage rejection with no human review route | UK GDPR Art 22 (as amended by DUAA 2025) |
+| Contextual | No AI disclosure | Article 50 shortfall only when territorial scope, responsible role, effective date and the interaction test establish the duty; otherwise future readiness or guidance |
+| Contextual | Placeholder escalation address | Binding-law severity only where an applicable redress or automated-decision safeguard requires it; otherwise a technical or guidance gap |
+| Technical | Low moderation on a public agent | Risk-rate against audience, use case and tested safety controls; do not present the setting alone as a statutory breach |
+| Contextual | Automated rejection without human review | Apply automated-decision law only when the decision is solely automated and legally or similarly significant |
 
 ## Keeping it current
 
-The reference files state the law **as of early 2026**. EU AI Act obligations phase in through 2027 and UK legislation is evolving — the skill instructs the model to verify key dates via web search before any formal deliverable, and to research live for jurisdictions beyond the EU/UK.
+The reference files were updated in **July 2026**. EU AI Act obligations phase in through 2027 and UK legislation and guidance continue to evolve. The skill requires current official-source verification of territorial scope, commencement and amendments before formal deliverables, and live research for jurisdictions beyond the EU/UK.

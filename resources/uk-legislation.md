@@ -1,8 +1,8 @@
-# UK AI & Data Legislation Reference (as of early 2026)
+# UK AI & Data Legislation Reference (updated July 2026)
 
-Supporting reference for the `copilot-studio-ai-compliance` skill. Cite findings using the instrument + section and the official links below. Verify via web search before formal deliverables — UK AI legislation is evolving.
+Supporting reference for the `copilot-studio-ai-compliance` skill. Cite findings using the instrument and section with the official links below. Verify current law, commencement, and regulator guidance before formal deliverables.
 
-> **Important:** a UK-facing agent must ALSO be assessed against EU legislation — the EU AI Act (Art 2(1)(c)) and EU GDPR (Art 3(2)) apply extraterritorially where output is used in the EU or services are offered to EU data subjects. Load `eu-legislation.md` as well and report those items under "EU law applying extraterritorially".
+> **EU exposure is conditional:** load `eu-legislation.md` when facts indicate that output is used in the EU or the organisation offers goods or services to, or monitors, EU data subjects. Do not infer EU applicability solely from UK operation or technical reachability. Apply the EU AI Act and EU GDPR territorial tests separately.
 
 ## Official sources
 
@@ -23,7 +23,7 @@ Section-level links on legislation.gov.uk follow the pattern `https://www.legisl
 
 ## 1. UK AI regulatory framework
 
-No single AI act. The 2023 white paper sets **five cross-sector principles** applied by existing regulators (ICO, FCA, CMA, Ofcom, EHRC, MHRA…):
+No single cross-sector AI act is in force. The 2023 white paper sets five cross-sector principles for existing regulators (ICO, FCA, CMA, Ofcom, EHRC, MHRA and others) to interpret within their remits:
 
 1. Safety, security and robustness
 2. Appropriate transparency and explainability
@@ -31,14 +31,16 @@ No single AI act. The 2023 white paper sets **five cross-sector principles** app
 4. Accountability and governance
 5. Contestability and redress
 
-Watch for: any UK AI bill progressing after early 2026 (verify before formal deliverables).
+The principles are non-statutory and context-specific. Do not cite a principle alone as proof of a legal breach. Identify the binding law, sector rule, or regulator power that applies; otherwise label the finding regulatory guidance or good practice.
+
+Watch for new UK AI legislation or regulator rules after July 2026 and verify them before formal deliverables.
 
 ## 2. UK GDPR + Data Protection Act 2018
 
 Same core structure as EU GDPR. Key AI-specific points:
 
-- **Automated decision-making (UK GDPR Art 22, as amended by the Data (Use and Access) Act 2025)**: UK rules were relaxed — solely automated decisions with significant effects are permitted (outside special-category data) **provided safeguards exist**: informing the individual, right to human intervention, right to make representations and contest. Special-category data still needs explicit consent or a substantial-public-interest basis.
-- **ICO guidance**: "Guidance on AI and data protection", "Explaining decisions made with AI" (with the Alan Turing Institute), and the ICO's position on generative AI. A DPIA is expected for most AI systems processing personal data.
+- **Automated decision-making (UK GDPR Articles 22A–22D, inserted by section 80 of the Data (Use and Access) Act 2025)**: section 80 commenced on 5 February 2026. Significant decisions based solely on automated processing require safeguards including information, representations, human intervention, and contestability. Additional restrictions apply to special-category data. Verify the current consolidated text and any regulations made under the new powers.
+- **ICO guidance**: use "Guidance on AI and data protection", "Explaining decisions made with AI", and current DPIA guidance. A DPIA is required where processing is likely to result in high risk. Innovative technology generally requires a DPIA when combined with another relevant risk criterion or when the circumstances otherwise meet the statutory test.
 
 ### Essentials for a data-collecting agent
 
@@ -52,7 +54,7 @@ Same core structure as EU GDPR. Key AI-specific points:
 | Storage limitation (Art 5(1)(e)) | Retention schedule — organisational evidence |
 | Security (Art 32) | Authentication mode, access control, channel security, connector scope |
 | ADM (Art 22 as amended by DUAA 2025) | Auto accept/reject with significant effect → safeguards: disclosure, human route, contest route |
-| DPIA (Art 35; DPA 2018 s.64 for law-enforcement processing) | Likely required — organisational |
+| DPIA (Art 35; DPA 2018 s.64 for law-enforcement processing) | Apply the likely-high-risk test and current ICO mandatory list; do not presume every AI system requires one — organisational |
 | Data subject rights (Arts 15–22) | Agent routes "delete/see my data" requests correctly |
 | Processors (Art 28) | Microsoft DPA, environment data residency — organisational |
 | Special category data (Art 9; DPA 2018 Sch 1) | Any collected or likely volunteered? Handling rules present? |
@@ -60,6 +62,6 @@ Same core structure as EU GDPR. Key AI-specific points:
 ## 3. Other UK statutes relevant to a customer-facing agent
 
 - **Equality Act 2010** — anticipatory reasonable-adjustments duty (ss.20–21, s.29 for services); accessibility of the chat interface and adaptive cards; no indirectly discriminatory gating rules (s.19).
-- **Digital Markets, Competition and Consumers Act 2024** — unfair commercial practices regime (Part 4, Ch 1; replaced the CPRs 2008): a bot must not mislead about being human, about capabilities, or about material booking/contract information.
+- **Digital Markets, Competition and Consumers Act 2024** — unfair commercial practices regime (Part 4, Ch 1; replaced the CPRs 2008): assess whether the overall commercial practice is misleading about identity, capabilities, or material transaction information. The Act does not create a universal standalone chatbot-disclosure rule.
 - **Consumer Rights Act 2015** — pre-contract information where the agent forms contracts/bookings (Part 1, Ch 2).
 - **Online Safety Act 2023** — only if the agent is part of a user-to-user or search service (rare for enterprise bots).

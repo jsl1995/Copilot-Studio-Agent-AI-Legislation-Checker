@@ -1,200 +1,272 @@
 ---
 name: copilot-studio-ai-compliance
-description: Assess an unpacked Microsoft Copilot Studio agent (agent.mcs.yml + topics/actions/variables) for compliance with AI legislation. Asks which region(s) the agent will operate in (UK, EU, both, or other — other jurisdictions are researched live via web search), then assesses against the applicable regimes — EU AI Act, UK pro-innovation AI principles, EU/UK GDPR & DPA 2018, and related consumer/equality duties. UK-facing agents are always also assessed against EU law (extraterritorial scope). Outputs severity-ranked High/Medium/Low findings, each citing the specific legislative provision with an official-source link, plus a coverage-matrix appendix and remediation plan split into YAML fixes vs organisational actions. Trigger on "AI compliance review", "EU AI Act check", "is this agent compliant", "AI legislation assessment", "regulatory review of this agent/copilot".
+description: Assess an unpacked Microsoft Copilot Studio agent (agent.mcs.yml plus topics, actions, variables, and available environment evidence) against applicable AI, data-protection, consumer, and equality requirements. Establish jurisdiction and legal applicability before scoring; distinguish binding law, future obligations, regulatory guidance, and technical controls; and report YAML-observable findings separately from tenant or organisational evidence gaps. Use for requests such as "AI compliance review", "EU AI Act check", "is this agent compliant", "AI legislation assessment", or "regulatory review of this agent/copilot".
 ---
 
 # Copilot Studio AI Legislation Compliance Assessor
 
-You are an AI governance specialist assessing a Microsoft Copilot Studio agent against the AI-relevant legislation of the region(s) where it will operate. You work from the agent's unpacked source files, citing concrete evidence (`file:line`) for every finding and the specific legislative provision (instrument + article/section, with official link) for every obligation.
+Assess Microsoft Copilot Studio agents as an AI governance specialist. Ground every conclusion in evidence, state the legal applicability test, and do not convert guidance or technical recommendations into statutory breaches.
 
-> ⚠️ **Always include this disclaimer in your output:** This is a technical compliance assessment, not legal advice. Findings should be validated by qualified legal counsel and the organisation's DPO before being relied upon.
+> **Always include this disclaimer:** This is a technical compliance assessment, not legal advice. Findings should be validated by qualified legal counsel and the organisation's DPO before being relied upon.
 
-## Step 0 — Locate and inventory the agent
+## Step 0 - Locate the agent and define the evidence boundary
 
-Find the unpacked agent root (the folder containing `agent.mcs.yml`). If the user didn't specify one and several exist, ask which. Then inventory:
+Find the unpacked agent root containing `agent.mcs.yml`. If several candidates exist, ask the user which one to assess.
 
-| File(s) | Compliance signals to extract |
+Inventory the source evidence:
+
+| File(s) | Signals to extract |
 |---|---|
-| `agent.mcs.yml` | Instructions: purpose, persona, guardrails, PII handling, escalation, prompt-injection resilience, grounding/fallback rules. `gptCapabilities` (webBrowsing, codeInterpreter). Model settings. |
-| `settings.mcs.yml` | `authenticationMode`, `accessControlPolicy`, `contentModeration` level, `useModelKnowledge`, `isFileAnalysisEnabled`, `GenerativeActionsEnabled`, `isAgentConnectable`, published date, language. |
-| `topics/*.mcs.yml` | AI disclosure in greeting/conversation-start messages; what personal data is asked for and why; automated accept/reject decisions; human escalation paths (Escalate topic); error handling (OnError); consent/confirmation steps; retention or deletion messaging. |
-| `actions/*.mcs.yml` | Which external systems receive personal data (e.g. Dataverse writes), what columns/fields are written, filters used for lookups. |
-| `variables/*.mcs.yml` | Persisted personal data fields — the de facto data-capture schema. |
-| `connectionreferences.mcs.yml`, `.mcs/conn.json` | Data-flow destinations, connector footprint. |
-| Knowledge source files (if any) | Grounding sources, public vs internal data, copyright exposure. |
+| `agent.mcs.yml` | Purpose, persona, instructions, PII handling, escalation, injection resilience, grounding, fallback rules, model capabilities |
+| `settings.mcs.yml` | Authentication, access policy, moderation, model knowledge, file analysis, generative actions, connectability, language |
+| `topics/*.mcs.yml` | Disclosure, data collection, automated decisions, escalation, errors, confirmation and consent steps |
+| `actions/*.mcs.yml` | External destinations, data written or retrieved, filters, action authorization, connector use |
+| `variables/*.mcs.yml` | Declared and persisted data fields |
+| `connectionreferences.mcs.yml`, `.mcs/conn.json` | Connector footprint and declared data-flow destinations |
+| Knowledge source files | Grounding scope, source sensitivity, copyright and access implications |
 
-Build a short **personal-data map**: every personal-data item captured (name, email, mobile, registration, postcode, etc.), where it's collected (topic), where it's stored/sent (action/table), and whether the instructions justify the need for it.
+Request or identify tenant/runtime evidence when available:
 
-## Step 1 — Ask which region(s) the agent will operate in
+- Conversation-transcript saving, access, download, and retention settings
+- Published channels, authentication configuration, and host-page controls
+- Environment and environment-group data policies
+- Maker-provided versus end-user connector credentials
+- Security roles, connection permissions, and least-privilege configuration
+- Environment region, data residency, and cross-border transfer information
+- Privacy notice, retention schedule, DPIA, lawful-basis record, incident process, and DSR process
 
-Use AskUserQuestion: "Which region(s) will this agent operate in / serve users from?" with options **UK**, **EU**, **UK + EU**, **Other** (user names the jurisdictions). Then load reference material accordingly:
+Read `resources/copilot-studio-controls.md` for the platform evidence surfaces and official Microsoft documentation.
 
-- **EU** → read `resources/eu-legislation.md`.
-- **UK** → read **BOTH** `resources/uk-legislation.md` **and** `resources/eu-legislation.md`. A UK-facing agent is still assessed against EU legislation because of extraterritorial scope — EU AI Act Art 2(1)(c) (output used in the EU) and EU GDPR Art 3(2) (offering services to / monitoring EU data subjects). In the report, lead with UK obligations and place EU items under an explicit **"EU law applying extraterritorially"** heading with a standing note explaining why they are in scope despite UK-only deployment. Never silently drop EU law for a UK agent.
-- **UK + EU** → read both files; both regimes are directly applicable.
-- **Other** → do NOT rely on stored references. Research the named jurisdiction(s) live via web search: AI-specific legislation, data protection law, and consumer law, preferring official government/legislative sources. Build the requirement set from what you find, mark the report **"research-based — verify with local counsel"**, and cite only sources you actually fetched. Also flag EU extraterritorial reach if the agent could serve EU users.
+Build a personal-data map covering both structured fields and free-form conversation content. Include user messages, generated replies, transcripts, telemetry or metadata, action payloads, knowledge retrieval content, and exported analytics where evidence supports them.
 
-The reference files contain the official-source links (EUR-Lex, legislation.gov.uk, ICO) — take every legislation citation and link from them; never invent a link or article number.
+Separate conclusions into three evidence layers:
 
-## Step 2 — Determine role and risk classification
+1. **Source-observable** - established from the unpacked files.
+2. **Tenant/runtime evidence required** - depends on environment, channel, policy, credential, transcript, or hosting configuration.
+3. **Organisational evidence required** - depends on governance documents or operational processes.
 
-**Role under the EU AI Act** (whenever the EU regime is in scope, which includes UK selections): an organisation building an agent in Copilot Studio on Microsoft's models is almost always a **deployer** (and possibly a downstream provider if it materially modifies/rebrands the system). Microsoft is the provider of the underlying GPAI model. State the assumed role and its consequences — deployer obligations are narrower than provider obligations.
+If only unpacked YAML is available, label the report **"YAML-only assessment - tenant/runtime and organisational controls not verified"**. Never describe that evidence boundary as a complete compliance determination.
 
-**EU AI Act risk tier** — walk the tiers in order and justify with evidence:
+## Step 1 - Establish jurisdiction and effective law
 
-1. **Prohibited (Art 5)** — manipulative techniques, exploitation of vulnerability, social scoring, emotion recognition in workplace/education, etc. If any apply: stop, this is a High red-flag finding.
-2. **High-risk (Art 6 + Annex III)** — does the agent make or materially influence decisions in Annex III areas (employment, essential services, credit, education, law enforcement…)? A booking/customer-service chatbot is normally **not** high-risk, but check what its automated rejections actually gate access to.
-3. **Limited risk / transparency (Art 50)** — applies to virtually all conversational agents: users must be informed they are interacting with an AI system.
-4. **Minimal risk** — everything else.
+Use the runtime's structured user-input tool when one is available; otherwise ask concise questions in chat. Establish these facts rather than inferring them from a single region label:
 
-**UK framing** (when UK is in scope): no single AI statute — assess against the five cross-sector principles plus UK GDPR / DPA 2018 and ICO AI guidance.
+1. Where is the operating organisation established?
+2. Which countries are users located in or intentionally targeted from?
+3. Where will the agent's output be used?
+4. Is access technically or contractually restricted by geography?
 
-**Other regions**: classify under whatever framework the researched law provides (e.g. risk tiers, sectoral rules), or state that no AI-specific regime exists yet.
+Load references according to the answers:
 
-## Step 3 — Assess the requirement catalogue
+- **EU in scope** - read `resources/eu-legislation.md` when the operator/deployer is in the EU, the system is placed on the EU market, output is used in the EU, or EU data subjects are offered services or monitored under the relevant instrument's test.
+- **UK in scope** - read `resources/uk-legislation.md` when the operator or intended service is in the UK.
+- **UK only on established facts** - do not state that EU law applies merely because a UK service could technically be reached from the EU. Record EU exposure as conditional when EU use or targeting is plausible but unverified.
+- **Other jurisdictions** - research current AI-specific, data-protection, consumer, and sectoral law using official sources. Mark the result **"research-based - verify with local counsel"**.
 
-Assess every requirement below **that belongs to a regime in scope** (region tags: `[EU]`, `[UK]`, `[Neutral]` = always assessed). For UK-only selections, `[EU]` items are still assessed but reported under "EU law applying extraterritorially". Internally rate each requirement:
+Apply the EU AI Act and EU GDPR territorial tests separately. The AI Act Article 2 and GDPR Article 3 are not interchangeable.
 
-- ✅ **Met** — evidence in the YAML satisfies it (cite `file:line`)
-- 🟡 / 🔴 **Shortfall** — becomes a severity-rated finding (Step 4)
-- ⚪ **N/A** — does not apply (say why)
-- 📋 **Org evidence required** — cannot be determined from YAML (DPIA, privacy notice, DPA with Microsoft, retention schedule, training records); list what the organisation must produce
+Before a formal or client-facing report, verify from official sources:
 
-Never rate ✅ without a citation. Never invent evidence.
+- the current date and commencement status of each relied-upon duty;
+- amendments, commencement regulations, and transitional provisions;
+- whether the cited rule is binding law, regulator guidance, a future obligation, or a technical control.
 
-### Dimension A — EU AI Act `[EU]`
-- A1. No prohibited practices (Art 5)
-- A2. Correct risk-tier classification documented; high-risk obligations triggered or ruled out (Art 6, Annex III)
-- A3. AI disclosure to users at conversation start (Art 50(1)) — check ConversationStart/Greeting topics for an explicit "I am an AI/virtual assistant" statement
-- A4. AI-generated content not presented as human; synthetic content marking where relevant (Art 50)
-- A5. Deployer duties: use per provider's instructions, human oversight arrangements, input-data relevance, incident reporting route (Art 26)
-- A6. AI literacy of staff operating the agent (Art 4) — 📋 organisational
+Use stored references as a starting point, not as proof that a time-sensitive rule is current.
 
-### Dimension B — UK AI principles `[UK]`
-- B1. Safety, security, robustness — grounding rules, hallucination guards ("never fabricate/guess"), error handling, prompt-injection resilience, moderation level, webBrowsing/codeInterpreter disabled unless justified
-- B2. Transparency & explainability — AI disclosure, explanation of why a request is rejected (e.g. out-of-coverage), named knowledge sources
-- B3. Fairness — no discriminatory gating; consistent rules for all customer types; accessibility of adaptive cards (Equality Act 2010 anticipatory duty)
-- B4. Accountability & governance — ownership, publish/change history, ALM 📋
-- B5. Contestability & redress — escalation to a human, complaint route, working contact details (flag placeholder addresses like `test@test.com`)
+## Step 2 - Determine role, use case, and risk classification
 
-### Dimension C — Data protection `[EU: GDPR]` `[UK: UK GDPR + DPA 2018]`
-Cite the EU GDPR article, the UK GDPR provision, or both, per the regimes in scope (article numbers largely align; UK Art 22 is modified by the Data (Use and Access) Act 2025 — see `uk-legislation.md`).
-- C1. Lawful basis identified for each processing purpose 📋
-- C2. Data minimisation — personal-data map vs stated purpose; instructions should refuse volunteered excess PII (payment details, passwords, NI numbers)
-- C3. Transparency — privacy notice available/linked at point of collection
-- C4. Automated decision-making (Art 22) — does the agent make solely automated decisions with legal/similarly significant effect? If it auto-rejects requests, is there human review or a route to one?
-- C5. DPIA — AI + systematic PII processing generally triggers one 📋
-- C6. Retention & deletion — is captured data retention-bound anywhere? 📋
-- C7. Special category data — is any collected or likely volunteered? Are there handling rules?
-- C8. Security of processing (Art 32) — authenticationMode, access control policy, channel security; flag `authenticationMode: None` on any agent handling personal data
-- C9. Processor/sub-processor chain — Microsoft DPA, data residency of environment 📋
-- C10. Data subject rights routing — can a user ask "delete my data" and get a correct answer/route?
+### EU AI Act role
 
-### Dimension D — Consumer & equality law `[EU: UCPD, EAA]` `[UK: DMCC Act 2024, CRA 2015, Equality Act 2010]`
-- D1. No misleading claims about capability or human identity
-- D2. Pre-contractual information accuracy where the agent takes bookings/orders
-- D3. Accessibility & non-discrimination
+Determine role from the facts. An organisation using Copilot Studio is commonly a deployer, while Microsoft supplies underlying platform and model capabilities. Also test whether the organisation develops or has an AI system developed and places it on the market or puts it into service under its own name, substantially modifies a high-risk system, or changes its intended purpose. State uncertainties instead of assuming that every Copilot Studio customer has the same role.
 
-### Dimension E — Platform technical controls `[Neutral]`
-- E1. `contentModeration` set appropriately for audience (flag `Low` on public-facing agents)
-- E2. `useModelKnowledge` — if true, does it conflict with "sole source of truth" instructions?
-- E3. `GenerativeActionsEnabled` — orchestrator can invoke actions autonomously; is that governed by instructions?
-- E4. Web browsing / code interpreter / file analysis disabled unless required
-- E5. Connections and actions scoped to least privilege (named tables/filters, no broad queries)
+### EU AI Act risk and obligation gates
 
-### Evidence map — YAML artefact → obligation
+Walk the following gates in order and cite evidence:
 
-| YAML evidence | Obligations it evidences |
-|---|---|
-| AI disclosure in ConversationStart/Greeting message | EU AI Act Art 50(1); UK transparency principle; UCPD/DMCC (not posing as human) |
-| "Never fabricate / escalate on no-match" instructions | Robustness (UK P1); GDPR accuracy Art 5(1)(d); AI Act Art 26 oversight |
-| Escalate topic + real contact route | Contestability/redress (UK P5); Art 22 safeguards |
-| "Only collect data needed…" instruction + variable list | Data minimisation Art 5(1)(c) |
-| Refusal of volunteered PII (payment, passwords, NI) | Minimisation; security |
-| Confirmation summary before submit | GDPR accuracy; consumer pre-contract info |
-| Prompt-injection resilience instruction | Security (Art 32); robustness |
-| `contentModeration` level | Safety (UK P1) |
-| `useModelKnowledge: false` + named knowledge sources | Transparency/explainability; accuracy |
-| `webBrowsing/codeInterpreter/fileAnalysis: false` | Attack-surface minimisation |
-| `authenticationMode` + `accessControlPolicy` | Art 32 security |
-| Action files: named tables, scoped filters | Purpose limitation; least privilege |
-| OnError topic with clean failure | Robustness |
+1. **Prohibited practice (Article 5)** - identify manipulative practices, exploitation of vulnerability, social scoring, prohibited biometric uses, or other applicable categories. If a credible signal exists, report a High red flag and require legal review.
+2. **High-risk (Article 6 and Annex I/III)** - determine whether the system makes or materially influences a listed decision. Apply exclusions and document the reasoning.
+3. **Transparency (Article 50)** - test the specific paragraph, responsible role, effective date, and the Article 50(1) exception where interaction with AI is obvious to a reasonably well-informed, observant, and circumspect person.
+4. **Other/minimal risk** - state which mandatory duties remain and which controls are advisory good practice.
 
-## Step 4 — Severity-rate the findings and output the report
+Do not apply Article 26 high-risk deployer duties as mandatory requirements to a non-high-risk agent.
 
-Every shortfall becomes a finding rated:
+### UK framing
 
-- 🔴 **High** — likely breach of an applicable legal obligation, or blocks safe go-live. Examples: no AI disclosure at conversation start; placeholder escalation address (`test@…`); PII capture with `authenticationMode: None`; any Art 5 prohibited-practice signal; no privacy notice at point of collection.
-- 🟠 **Medium** — partial control or likely regulator concern; fix before or shortly after go-live. Examples: `contentModeration: Low` on a public agent; auto-reject with no human route; `useModelKnowledge: true` contradicting sole-source-of-truth instructions.
-- 🟡 **Low** — best-practice improvement, low legal exposure. Examples: no explanation offered for rejections; language/accessibility niceties.
-- 📋 **Org evidence required** items are listed separately, NOT severity-rated — they cannot be judged from YAML.
+Assess the five cross-sector AI principles as non-statutory regulatory guidance unless current binding law or sector-specific rules impose the same control. Identify the regulator and legal provision that would make a finding enforceable; otherwise label it guidance or good practice.
 
-**Finding format** (every field mandatory):
+## Step 3 - Apply applicability gates and assess requirements
 
+For every requirement, record:
+
+- **Basis type:** Binding law / Future obligation / Regulatory guidance / Technical control
+- **Applicability:** why the rule applies, does not apply, or remains uncertain
+- **Effective status:** in force / future dated / transitional / unverified
+- **Evidence status:** Met / Shortfall / N/A / Tenant-runtime evidence required / Organisational evidence required
+
+Never rate a requirement as Met without evidence. Never turn missing external evidence into a confirmed source-code defect.
+
+### A - EU AI Act (only when its territorial test is met)
+
+- A1. Article 5 prohibited practices - in force; assess relevant categories
+- A2. Article 6 and Annex I/III risk classification - document use-case facts, exclusions, and effective dates
+- A3. Article 50(1) interaction disclosure - check responsible role, effective date, and the "obvious" exception
+- A4. Article 50 synthetic or public-interest content duties - assess only for relevant content and role
+- A5. Article 26 deployer duties - mandatory only when the system is high-risk; otherwise identify chosen controls as good practice
+- A6. Article 4 AI literacy - organisational evidence
+
+### B - UK AI principles and sector guidance
+
+- B1. Safety, security, and robustness
+- B2. Appropriate transparency and explainability
+- B3. Fairness
+- B4. Accountability and governance
+- B5. Contestability and redress
+
+Label these as non-statutory unless tied to an applicable binding provision enforced by the relevant regulator.
+
+### C - Data protection
+
+Apply EU GDPR, UK GDPR/DPA 2018, or both only after territorial scope is established.
+
+- C1. Lawful basis for each purpose - organisational evidence
+- C2. Data minimisation across structured fields, free-text messages, transcripts, and action payloads
+- C3. Transparency information at or before collection; check the agent, host page, and channel experience
+- C4. Solely automated significant decisions; distinguish ordinary routing or inconvenience from legal or similarly significant effects
+- C5. DPIA - apply the statutory "likely high risk" test and current regulator criteria; do not presume every AI system requires one
+- C6. Retention and deletion across business records, transcripts, telemetry, and exports
+- C7. Special-category or highly sensitive data handling
+- C8. Risk-appropriate security under Article 32; do not treat authentication as the only control
+- C9. Processor/sub-processor, residency, and transfer evidence
+- C10. Data-subject-rights routing and operational fulfilment
+
+### D - Consumer and equality law
+
+Determine whether the service, transaction, user group, territorial scope, and statutory exemptions bring each instrument into scope before scoring:
+
+- D1. Misleading identity, capability, or material information
+- D2. Pre-contract information where the agent forms or facilitates a relevant transaction
+- D3. Accessibility and non-discrimination for the applicable service and audience
+
+### E - Platform technical controls
+
+Treat these as technical controls unless an identified legal duty requires the specific measure:
+
+- E1. Moderation appropriate to audience and use case
+- E2. Model knowledge consistent with grounding and accuracy claims
+- E3. Autonomous generative actions governed by instructions and authorization
+- E4. Browsing, code execution, and file analysis justified and constrained
+- E5. Connections, actions, queries, and credentials follow least privilege
+- E6. Authentication appropriate to data sensitivity, user population, and action authorization
+
+### F - Tenant/runtime controls
+
+- F1. Transcript saving, access, download, retention, and deletion
+- F2. Published channels, geographical restrictions, and host-page notices
+- F3. Environment/group data policies and connector governance
+- F4. Maker-provided versus end-user credentials
+- F5. Security roles and administrative access
+- F6. Environment region, residency, transfers, logging, and incident evidence
+
+## Step 4 - Rate and report findings
+
+Rate severity only after determining basis type, applicability, effective status, impact, and evidence confidence:
+
+- **High** - strong evidence of a likely breach of binding law currently in force, a prohibited-practice signal, exposure of restricted data/actions, or another condition that blocks safe go-live.
+- **Medium** - a material partial control, unresolved applicability with credible exposure, or a security/governance weakness requiring remediation.
+- **Low** - a limited-impact improvement with low immediate exposure.
+- **Advisory / future readiness** - non-statutory guidance, good practice, or a duty not yet in force. Do not call this a breach.
+- **Evidence required** - tenant/runtime or organisational evidence is unavailable. Do not severity-rate the absence unless the organisation confirms the control is missing.
+
+Examples are context-dependent, not fixed severities:
+
+- Missing AI disclosure may be a future-readiness item, a current Article 50 shortfall, or N/A under the obvious-interaction exception depending on date and facts.
+- Anonymous access can be appropriate for a public FAQ or high risk when restricted data or privileged actions are exposed.
+- Missing human review matters under automated-decision rules only when the decision is solely automated and legally or similarly significant; it can still be a guidance-based usability concern otherwise.
+- A privacy notice absent from YAML is an evidence request until the host page and channel experience are checked.
+
+Use this finding format:
+
+```markdown
+### <ID> - <High/Medium/Low/Advisory> - <Title>
+- **Basis type:** <Binding law / Future obligation / Regulatory guidance / Technical control>
+- **Basis:** <instrument and article/section, official guidance, or named technical standard with official link>
+- **Applicability:** <facts and test establishing why it applies>
+- **Effective status:** <in force / future dated / transitional / verified on date>
+- **Evidence:** <file:line for present evidence; for an absence, list files and search/control checked; for external controls, state evidence required>
+- **Remediation:** <concrete and proportionate fix>
+- **Owner:** <YAML / Tenant administrator / Security / Privacy / Legal / Operations>
 ```
-### <ID> · <High/Medium/Low> · <Title>
-- **Legislation:** <instrument, article/section> ([official link from the reference file])
-- **Evidence:** <file:line> — <what the YAML shows or lacks>
-- **Remediation:** <concrete fix>
-- **Owner:** YAML fix / Organisational
-```
 
-**Report structure** — offer to save as `ai-compliance-report.md` in the agent folder:
+For absent controls, do not manufacture a line citation. Record the files or configuration surfaces inspected, the expected signal, and that no match was found.
 
-```
-# AI Legislation Compliance Assessment — <Agent Name>
-**Assessed:** <date> · **Regions:** <selected> · **Regimes assessed:** <list>
-**Disclaimer:** <the standard disclaimer>
+## Report output
+
+HTML is the primary report deliverable. Read and reuse `assets/report-template.html` as the structural and visual baseline. Offer to save the completed report as `ai-compliance-report.html` in the agent folder. The HTML must be self-contained: do not depend on a CDN, JavaScript framework, remote font, or external runtime to render the report.
+
+### Fluent UI dashboard contract
+
+Build the first viewport as a quiet, information-dense Fluent UI-style dashboard:
+
+- Use Segoe UI or a system sans-serif stack, Fluent UI neutral tokens, restrained blue accent tokens, 4-8px radii, clear borders, and accessible contrast. Do not use gradients, decorative blobs, or marketing-style hero content.
+- Show the agent name, assessment date, evidence boundary, jurisdiction status, regimes, and disclaimer in a compact header.
+- Show severity tiles in this exact order: **High**, **Medium**, **Low**. Follow them with **Advisory / future readiness** and **Evidence required** tiles. Each tile must show a count and activate its corresponding tab; severity tiles must filter the Findings view and the Evidence required tile must open Scope & evidence.
+- Add an accessible tab strip using `role="tablist"`, `role="tab"`, `aria-selected`, `aria-controls`, and `role="tabpanel"`. Include tabs for **Executive summary**, **Scope & evidence**, **Findings**, **Personal-data map**, **Remediation**, and **Coverage matrix**.
+- Keep one active tab visible at a time, support mouse and keyboard activation, and preserve the selected tab in the URL hash when practical. Do not hide important findings solely behind hover states.
+- Render each finding as a semantic `article` or card with its ID, severity, basis type, applicability, effective status, evidence, remediation, owner, and official links. Use text labels in addition to colour.
+- Keep the coverage matrix searchable or horizontally scrollable on small screens. Ensure tables, cards, tab labels, and long evidence paths wrap without clipping.
+- Include a print-friendly layout and a visible note when the report is YAML-only or has unverified tenant/runtime evidence.
+- Verify that dashboard counts equal the finding cards and that every in-scope coverage row is represented. Do not invent charts or scores unsupported by the evidence.
+
+Use the template's placeholders as data slots, not as literal report content. Escape user-controlled agent names, evidence text and URLs before inserting them into HTML. If the runtime cannot create or save HTML, provide the Markdown structure below as a fallback and state that HTML generation was unavailable. Markdown is not the primary output when HTML generation is possible.
+
+### HTML data contract
+
+The generated file must contain:
+
+1. A summary header and the required severity tiles.
+2. One tab panel for every section listed above.
+3. A findings data set whose counts drive the tiles, with no severity inferred from colour alone.
+4. The standard disclaimer in the header or executive-summary panel.
+5. Official source links near each legal or guidance basis.
+6. A coverage matrix containing every applicable A-F requirement, including N/A and evidence-required rows.
+
+## Markdown fallback structure
+
+Offer to save the fallback as `ai-compliance-report.md` only when HTML cannot be produced, or as a companion file when the user requests both.
+
+```markdown
+# AI Compliance Assessment - <Agent Name>
+**Assessed:** <date> | **Evidence boundary:** <scope> | **Jurisdictions:** <facts>
+**Regimes assessed:** <list with effective status>
+**Disclaimer:** <standard disclaimer>
 
 ## 1. Executive summary
-<3–6 sentences: risk tier, overall posture, count of High/Medium/Low findings, the 2–3 most material>
+<risk classification, evidence limitations, counts by severity and advisory/evidence status>
 
-## 2. Agent profile & personal-data map
-<table of PII items → collected in → stored to → justified?>
+## 2. Scope, assumptions, and evidence limitations
+<territorial facts, files inspected, tenant/runtime evidence received or missing>
 
-## 3. Risk classification
-Role: Deployer/Provider · EU AI Act tier: <tier> — <justification>
-<UK: regulator remit · Other: researched framework>
-<If UK-only selected: the standing "EU law applying extraterritorially" note — EU AI Act Art 2(1)(c), EU GDPR Art 3(2)>
+## 3. Agent profile and personal-data map
+<include free text, transcripts, metadata, actions, destinations, retention evidence>
 
-## 4. Findings
-### 🔴 High
-<findings, using the format above; for UK-only selections group EU-law findings under an "EU law applying extraterritorially" sub-heading>
-### 🟠 Medium
-### 🟡 Low
-### 📋 Organisational evidence required
-<what document/process the organisation must produce, and which obligation it satisfies>
+## 4. Role, risk, and applicability classification
+<role evidence, risk tier, territorial tests, commencement dates>
 
-## 5. Remediation plan
-### Fix in the agent YAML (offer to implement these)
-1. <prioritised by severity, concrete>
-### Organisational actions (outside the YAML)
-1. <e.g. complete DPIA, publish privacy notice, replace placeholder escalation email>
+## 5. Findings
+<binding-law findings first, then technical risks, advisory/future readiness, and evidence requests>
 
-## 6. What's working well
-<genuine strengths with citations>
+## 6. Remediation plan
+<separate YAML, tenant/admin, security, privacy/legal, and operational actions>
 
-## Appendix — Coverage matrix
-| Ref | Requirement | Regime | Rating | Finding / evidence |
-(one row per in-scope requirement A1–E5 — the audit trail proving everything was checked, incl. ✅ and ⚪ items; cross-reference finding IDs)
+## 7. Controls working as intended
+<genuine strengths with evidence>
+
+## Appendix - Coverage matrix
+| Ref | Requirement | Basis type | Applicability | Effective status | Evidence status | Finding/evidence |
 ```
 
-After presenting, offer to **implement the YAML-level fixes** (via the copilot-studio authoring skills/agents) — e.g. adding an AI-disclosure message, tightening PII refusal wording, raising content moderation.
+After presenting the report, offer to implement YAML-level fixes only when appropriate authoring tools are available. Confirm tool availability and request approval before any tenant or production change.
 
-### Common findings & standard severities
+## Evaluation
 
-| Finding | Typical severity | Remediation |
-|---|---|---|
-| No "I am an AI" statement in first message | High (Art 50 from Aug 2026; UK transparency + DMCC now) | Add disclosure sentence to ConversationStart/Greeting topic |
-| Placeholder escalation email (test@…) | High (redress) | Replace with monitored mailbox/queue before go-live |
-| `authenticationMode: None` + PII capture | High/Medium (Art 32) | Enable auth or document channel-level controls |
-| No privacy notice link at data collection | High (Arts 12–14) | Add link/message before first personal-data question |
-| `contentModeration: Low` public-facing | Medium | Raise unless a tested reason exists |
-| `useModelKnowledge: true` alongside "sole source of truth" instruction | Medium (consistency) | Disable or reconcile instructions |
-| Auto-reject (e.g. out of coverage) with no human route | Medium (Art 22 / UK P5) | Offer escalation on rejection |
-| No explanation for automated rejections | Low (explainability) | Add reason to rejection messages |
-| No DPIA / retention / lawful-basis documentation visible | 📋 | Organisation to produce; not a YAML fix |
-
-## Currency check
-
-The reference files state the law as of early 2026. EU AI Act obligations phase in through 2027 and UK legislation is evolving. For "Other" regions, live web research is **mandatory** (there is no stored reference). For EU/UK, verify key dates and any new legislation via web search before finalising a formal/client deliverable.
+Use the scenarios in `evals/cases.json` when changing jurisdiction, applicability, severity, or evidence rules. Run `scripts/validate-skill.ps1` and the standard skill validator after edits.

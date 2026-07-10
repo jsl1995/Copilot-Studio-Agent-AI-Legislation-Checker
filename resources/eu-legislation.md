@@ -1,6 +1,6 @@
-# EU AI & Data Legislation Reference (as of early 2026)
+# EU AI & Data Legislation Reference (updated July 2026)
 
-Supporting reference for the `copilot-studio-ai-compliance` skill. Cite findings using the instrument + article and the official links below. Verify dates via web search before formal deliverables.
+Supporting reference for the `copilot-studio-ai-compliance` skill. Cite findings using the instrument and article with the official links below. Verify territorial scope, current consolidated text, and commencement before formal deliverables.
 
 ## Official sources
 
@@ -26,11 +26,11 @@ Entered into force 1 August 2024. Phased application:
 | 2 Aug 2027 | High-risk AI embedded in regulated products (Annex I) |
 
 ### Territorial scope (Art 2) — extraterritorial reach
-The Act applies not only to providers/deployers established in the EU but also to providers and deployers established in a **third country (e.g. the UK) where the output produced by the AI system is used in the EU** (Art 2(1)(c)). **Practical consequence: a UK-facing agent reachable by or serving EU users is in scope — never rule the AI Act out just because deployment is UK-only.**
+The Act applies to the actors listed in Article 2. Article 2(1)(c) includes providers and deployers established in a third country where output produced by the AI system is used in the EU. Establish actual or intended EU use from deployment, users, contracts, channels, and operational facts. Technical reachability from the EU alone does not prove that output is used there; record uncertain exposure as conditional rather than declaring the Act applicable.
 
 ### Roles (Art 3)
-- **Provider** — develops an AI system / GPAI model and places it on the market under its own name.
-- **Deployer** — uses an AI system under its authority in a professional context. *An organisation configuring a Copilot Studio agent is normally a deployer; it can become a provider if it puts its name/trademark on a high-risk system or substantially modifies one.*
+- **Provider** — develops an AI system or GPAI model, or has one developed, and places it on the market or puts it into service under its own name or trademark.
+- **Deployer** — uses an AI system under its authority in a professional context. An organisation configuring Copilot Studio is commonly a deployer, but role classification depends on how the resulting system is developed, branded, supplied, modified, and put into service. Apply Article 25 separately where a high-risk system is involved.
 
 ### Art 5 — Prohibited practices (check-list)
 Subliminal or purposefully manipulative techniques causing significant harm; exploiting vulnerabilities (age, disability, social/economic situation); social scoring; predictive policing based solely on profiling; untargeted facial-image scraping; emotion recognition in workplace/education; biometric categorisation inferring sensitive attributes; real-time remote biometric ID in public spaces (law enforcement, narrow exceptions).
@@ -38,13 +38,13 @@ Subliminal or purposefully manipulative techniques causing significant harm; exp
 ### Art 6 + Annex III — High-risk areas (summary)
 Biometrics; critical infrastructure; education & vocational training; **employment/worker management**; access to essential private & public services (incl. credit scoring, insurance pricing, emergency dispatch); law enforcement; migration/border; justice & democratic processes. A system is high-risk if it is a safety component of these or makes/materially influences such decisions. Art 6(3) carve-out: narrow procedural tasks, improving prior human activity, etc. — must be documented.
 
-### Art 50 — Transparency (limited-risk; applies to chatbots)
-- 50(1): people must be informed they are interacting with an AI system, unless obvious to a reasonably well-informed person. **Practical test: does the first agent message say it's an AI/virtual assistant?**
+### Art 50 — Transparency (generally applies from 2 August 2026)
+- 50(1): providers must ensure that systems intended to interact directly with natural persons inform them that they are interacting with AI, unless this is obvious to a reasonably well-informed, observant, and circumspect person in the circumstances. Check the responsible role, effective date, complete user experience, and the exception rather than treating an exact greeting phrase as the statutory test.
 - 50(2): synthetic audio/image/video/text content must be marked machine-readably (provider duty).
 - 50(4): deployers of deep fakes / AI text published to inform the public must disclose.
 
-### Art 26 — Deployer obligations (relevant even for non-high-risk, as good practice; mandatory for high-risk)
-Use per provider's instructions for use; assign human oversight to competent persons; ensure input data is relevant; monitor operation; keep logs; inform workers/affected persons where required; report serious incidents.
+### Art 26 — Deployer obligations for high-risk AI systems
+Article 26 duties apply to deployers of high-risk AI systems. They include use according to instructions, competent human oversight, relevant and sufficiently representative input data where controlled by the deployer, monitoring, logs, notices, and incident cooperation. For non-high-risk agents, similar controls may be useful good practice but must not be described as mandatory Article 26 duties.
 
 ### Art 4 — AI literacy
 Providers and deployers must ensure sufficient AI literacy of staff operating AI systems. Organisational evidence: training records, usage guidance.
@@ -69,7 +69,7 @@ Applies to controllers/processors outside the EU when **offering goods or servic
 | Storage limitation (Art 5(1)(e)) | Retention schedule — organisational evidence |
 | Security (Art 32) | Authentication mode, access control, channel security, connector scope |
 | Automated decision-making (Art 22) | Solely automated decisions with legal/similarly significant effect require a basis + safeguards: disclosure, human intervention, right to contest |
-| DPIA (Art 35) | Innovative tech + systematic processing → likely required — organisational |
+| DPIA (Art 35) | Apply the "likely to result in a high risk" test, regulator lists, and relevant criteria. Innovative technology is a risk indicator, not a universal trigger by itself — organisational evidence |
 | Data subject rights (Arts 15–22) | Agent can route "delete/see my data" requests correctly |
 | Processors (Art 28) | Microsoft DPA, environment data residency — organisational |
 | Special category data (Art 9) | Any collected or likely volunteered? Handling rules present? |
@@ -77,4 +77,4 @@ Applies to controllers/processors outside the EU when **offering goods or servic
 ## 3. Consumer & accessibility law
 
 - **Unfair Commercial Practices Directive 2005/29/EC** — a bot must not mislead about being human, about capabilities, or about material transaction information (Arts 6–7, misleading actions/omissions).
-- **European Accessibility Act — Directive (EU) 2019/882** — consumer-facing digital services (incl. e-commerce interfaces) must meet accessibility requirements from 28 June 2025; check adaptive-card-only flows have accessible alternatives.
+- **European Accessibility Act — Directive (EU) 2019/882** — applies to listed products and services, including specified electronic communications, consumer banking, transport-related elements, e-books and e-commerce services, subject to territorial, service, and exemption tests. Do not apply it to every consumer-facing chatbot without first establishing that the underlying service is in scope.

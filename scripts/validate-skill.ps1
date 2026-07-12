@@ -1,3 +1,6 @@
+# Deterministic content-contract checks (PowerShell 7).
+# Cross-platform equivalent: scripts/validate-skill.py (no PowerShell required).
+# Keep the two scripts' assertions in sync when editing either.
 param(
     [string]$Root = (Split-Path -Parent $PSScriptRoot)
 )

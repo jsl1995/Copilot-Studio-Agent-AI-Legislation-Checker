@@ -1,4 +1,4 @@
-# Copilot Studio AI Compliance Skill
+# Copilot Studio Agent - AI Legislation Checker
 
 An agent skill that assesses a **Microsoft Copilot Studio agent** for compliance with AI legislation. Point it at an unpacked agent (the local YAML produced by cloning an agent) and it produces a severity-ranked compliance report.
 
@@ -24,6 +24,7 @@ An agent skill that assesses a **Microsoft Copilot Studio agent** for compliance
 
 ```
 SKILL.md                        # the skill definition (Agent Skills format)
+LICENSE                         # MIT
 resources/
   eu-legislation.md             # EU AI Act, EU GDPR, UCPD, EAA — with EUR-Lex links
   uk-legislation.md             # UK AI principles, UK GDPR/DPA 2018, DUAA 2025, Equality Act, DMCC — with legislation.gov.uk/ICO links
@@ -33,8 +34,23 @@ assets/
 evals/
   cases.json                    # Regression scenarios for scope, applicability, severity and evidence
 scripts/
-  validate-skill.ps1           # Deterministic content-contract checks
+  validate-skill.py             # Deterministic content-contract checks (Python 3, cross-platform)
+  validate-skill.ps1            # Same checks for PowerShell 7 environments
 ```
+
+## Validating changes
+
+After editing any skill file, run the content-contract validator (both scripts assert the same contract — use whichever runtime you have):
+
+```bash
+python3 scripts/validate-skill.py
+```
+
+```powershell
+pwsh scripts/validate-skill.ps1   # requires PowerShell 7+
+```
+
+The scenarios in `evals/cases.json` are judgement-based regression tests, not automated ones: when you change jurisdiction, applicability, severity, or evidence rules, run the skill against each scenario (or reason through it) and check the output meets every `expected` item and none of the `must_not` items.
 
 ## Prerequisite: clone your agent locally
 
@@ -75,11 +91,11 @@ and follow the prompts (environment selection → agent selection → local fold
    - **Project-scoped:** `<your-repo>/.claude/skills/copilot-studio-ai-compliance/`
 
    ```powershell
-   git clone https://github.com/jsl1995/copilot-studio-ai-compliance "$env:USERPROFILE\.claude\skills\copilot-studio-ai-compliance"
+   git clone https://github.com/jsl1995/Copilot-Studio-Agent-AI-Legislation-Checker "$env:USERPROFILE\.claude\skills\copilot-studio-ai-compliance"
    ```
 
    ```bash
-   git clone https://github.com/jsl1995/copilot-studio-ai-compliance ~/.claude/skills/copilot-studio-ai-compliance
+   git clone https://github.com/jsl1995/Copilot-Studio-Agent-AI-Legislation-Checker ~/.claude/skills/copilot-studio-ai-compliance
    ```
 
 2. Start Claude Code in (or navigate to) the folder containing your unpacked agent.
@@ -131,3 +147,7 @@ Notes for Copilot users:
 ## Keeping it current
 
 The reference files were updated in **July 2026**. EU AI Act obligations phase in through 2027 and UK legislation and guidance continue to evolve. The skill requires current official-source verification of territorial scope, commencement and amendments before formal deliverables, and live research for jurisdictions beyond the EU/UK.
+
+## License
+
+MIT — see [LICENSE](LICENSE).

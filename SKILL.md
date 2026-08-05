@@ -1,6 +1,7 @@
 ---
 name: copilot-studio-ai-compliance
 description: Assess an unpacked Microsoft Copilot Studio agent (agent.mcs.yml plus topics, actions, variables, and available environment evidence) against applicable AI, data-protection, consumer, and equality requirements. Establish jurisdiction and legal applicability before scoring; distinguish binding law, future obligations, regulatory guidance, and technical controls; and report YAML-observable findings separately from tenant or organisational evidence gaps. Use for requests such as "AI compliance review", "EU AI Act check", "is this agent compliant", "AI legislation assessment", or "regulatory review of this agent/copilot".
+license: MIT (see LICENSE)
 ---
 
 # Copilot Studio AI Legislation Compliance Assessor
@@ -11,7 +12,7 @@ Assess Microsoft Copilot Studio agents as an AI governance specialist. Ground ev
 
 ## Step 0 - Locate the agent and define the evidence boundary
 
-Find the unpacked agent root containing `agent.mcs.yml` **or** `agent.mcs.yaml`. If several candidates exist, ask the user which one to assess.
+Find the unpacked agent root containing `agent.mcs.yml` **or** `agent.mcs.yaml`. If several candidates exist, ask the user which one to assess. If neither file can be found, do not guess or assess unrelated YAML: ask the user for the path to the unpacked agent, or explain how to clone one locally first (Copilot Studio VS Code extension, or the Copilot Studio plugin's clone command).
 
 Clone layouts vary by extension version and mix extensions within one clone (for example `agent.mcs.yaml` beside `settings.mcs.yml`, and `topics/*.mcs.yaml` beside `actions/*.mcs.yml`). Treat `.mcs.yml` and `.mcs.yaml` as equivalent everywhere, inventory every folder actually present, and note unrecognized files in the report rather than skipping them.
 
@@ -275,4 +276,6 @@ After presenting the report, offer to implement YAML-level fixes only when appro
 
 ## Evaluation
 
-Use the scenarios in `evals/cases.json` when changing jurisdiction, applicability, severity, or evidence rules. Run `scripts/validate-skill.ps1` and the standard skill validator after edits.
+After editing any skill file, run the content-contract validator: `python3 scripts/validate-skill.py` (or `.\scripts\validate-skill.ps1` in PowerShell — the two scripts assert the same contract and must be kept in sync).
+
+When changing jurisdiction, applicability, severity, or evidence rules, also regression-test against `evals/cases.json`: for each case, run the skill against the described scenario (or reason through it explicitly), then check that the output satisfies every `expected` item and violates none of the `must_not` items. These checks are judgement-based rather than automated — record any deliberate behaviour change by updating the affected case.

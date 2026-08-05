@@ -78,11 +78,11 @@ and follow the prompts (environment selection → agent selection → local fold
    - **Project-scoped:** `<your-repo>/.claude/skills/copilot-studio-ai-compliance/`
 
    ```powershell
-   git clone https://github.com/jsl1995/copilot-studio-ai-compliance "$env:USERPROFILE\.claude\skills\copilot-studio-ai-compliance"
+   git clone https://github.com/jsl1995/Copilot-Studio-Agent-AI-Legislation-Checker "$env:USERPROFILE\.claude\skills\copilot-studio-ai-compliance"
    ```
 
    ```bash
-   git clone https://github.com/jsl1995/copilot-studio-ai-compliance ~/.claude/skills/copilot-studio-ai-compliance
+   git clone https://github.com/jsl1995/Copilot-Studio-Agent-AI-Legislation-Checker ~/.claude/skills/copilot-studio-ai-compliance
    ```
 
 2. Start Claude Code in (or navigate to) the folder containing your unpacked agent.

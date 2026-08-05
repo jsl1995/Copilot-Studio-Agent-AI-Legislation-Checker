@@ -2,6 +2,8 @@
 
 An agent skill that assesses a **Microsoft Copilot Studio agent** for compliance with AI legislation. Point it at an unpacked agent (the local YAML produced by cloning an agent) and it produces a severity-ranked compliance report.
 
+![AI compliance assessment report — Fluent UI dashboard with severity tiles and tabbed sections](assets/report-screenshot.png)
+
 ## What it does
 
 1. **Establishes jurisdiction from operational facts** — where the organisation is established, which users are targeted, where output is used, and whether access is geographically restricted. EU AI Act and GDPR extraterritorial scope are tested separately rather than inferred from UK operation alone.
@@ -30,6 +32,7 @@ resources/
   copilot-studio-controls.md    # Runtime evidence surfaces and Microsoft Learn links
 assets/
   report-template.html          # Self-contained Fluent UI-style dashboard template
+  report-screenshot.png         # Example report dashboard (shown above)
 evals/
   cases.json                    # Regression scenarios for scope, applicability, severity and evidence
 scripts/

@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Contoso Travel Desk - AI compliance assessment (sample)</title>
+  <style>
+    :root {
+      --brand-foreground: #0f6cbd;
+      --brand-background: #e8f3fc;
+      --brand-hover: #115ea3;
+      --neutral-foreground-1: #242424;
+      --neutral-foreground-2: #616161;
+      --neutral-foreground-3: #707070;
+      --neutral-background-1: #ffffff;
+      --neutral-background-2: #fafafa;
+      --neutral-background-3: #f5f5f5;
+      --neutral-stroke-1: #d1d1d1;
+      --neutral-stroke-2: #e1e1e1;
+      --high: #b10e1e;
+      --high-background: #fde7e9;
+      --medium: #8a5700;
+      --medium-background: #fff4ce;
+      --low: #107c10;
+      --low-background: #dff6dd;
+      --advisory: #5c2e91;
+      --advisory-background: #f1e9f9;
+      --shadow-2: 0 1px 2px rgba(0, 0, 0, .12);
+      --shadow-4: 0 2px 4px rgba(0, 0, 0, .14);
+      color-scheme: light;
+      font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      color: var(--neutral-foreground-1);
+      background: var(--neutral-background-3);
+    }
+
+    * { box-sizing: border-box; }
+    body { margin: 0; line-height: 1.45; }
+    a { color: var(--brand-foreground); }
+    a:hover { color: var(--brand-hover); }
+    .app-shell { max-width: 1440px; margin: 0 auto; padding: 24px; }
+    .sample-banner { margin: 0 0 16px; padding: 10px 14px; border: 1px solid var(--advisory); border-radius: 6px; background: var(--advisory-background); color: var(--advisory); font-weight: 600; font-size: .9rem; }
+    .report-header, .panel, .finding, .data-table-wrap { background: var(--neutral-background-1); border: 1px solid var(--neutral-stroke-2); border-radius: 6px; box-shadow: var(--shadow-2); }
+    .report-header { padding: 24px; }
+    .eyebrow { color: var(--neutral-foreground-2); font-size: .78rem; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
+    h1 { margin: 4px 0 8px; font-size: clamp(1.65rem, 3vw, 2.25rem); line-height: 1.15; }
+    h2 { margin: 0 0 12px; font-size: 1.35rem; }
+    h3 { margin: 0 0 8px; font-size: 1rem; }
+    .meta { display: flex; flex-wrap: wrap; gap: 8px 20px; color: var(--neutral-foreground-2); font-size: .9rem; }
+    .badge { display: inline-flex; align-items: center; min-height: 24px; padding: 2px 8px; border-radius: 4px; background: var(--brand-background); color: #084b83; font-weight: 600; }
+    .disclaimer { margin: 18px 0 0; padding: 12px 14px; border-left: 3px solid var(--brand-foreground); background: var(--neutral-background-2); color: var(--neutral-foreground-2); font-size: .9rem; }
+    .dashboard-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; margin: 16px 0; }
+    .tile { min-height: 112px; padding: 14px; border: 1px solid var(--neutral-stroke-2); border-top: 4px solid var(--brand-foreground); border-radius: 6px; background: var(--neutral-background-1); box-shadow: var(--shadow-2); text-align: left; cursor: pointer; font: inherit; }
+    .tile[data-severity="high"] { border-top-color: var(--high); background: var(--high-background); }
+    .tile[data-severity="medium"] { border-top-color: var(--medium); background: var(--medium-background); }
+    .tile[data-severity="low"] { border-top-color: var(--low); background: var(--low-background); }
+    .tile[data-severity="advisory"] { border-top-color: var(--advisory); background: var(--advisory-background); }
+    .tile-label { display: block; color: var(--neutral-foreground-2); font-size: .84rem; font-weight: 600; }
+    .tile-count { display: block; margin-top: 4px; font-size: 2rem; font-weight: 700; line-height: 1; }
+    .tile-action { display: block; margin-top: 10px; color: var(--brand-foreground); font-size: .82rem; }
+    .tabs { margin-top: 18px; }
+    [role="tablist"] { display: flex; gap: 2px; overflow-x: auto; border-bottom: 1px solid var(--neutral-stroke-1); }
+    [role="tab"] { flex: 0 0 auto; padding: 11px 14px; border: 0; border-bottom: 2px solid transparent; background: transparent; color: var(--neutral-foreground-2); cursor: pointer; font: inherit; font-weight: 600; }
+    [role="tab"]:hover, [role="tab"]:focus-visible { background: var(--neutral-background-2); color: var(--neutral-foreground-1); }
+    [role="tab"][aria-selected="true"] { border-bottom-color: var(--brand-foreground); color: var(--brand-foreground); }
+    [role="tabpanel"] { padding-top: 16px; }
+    .panel { padding: 20px; }
+    .summary-layout { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; }
+    .finding-list { display: grid; gap: 12px; }
+    .finding { padding: 16px; border-left: 4px solid var(--brand-foreground); }
+    .finding[data-severity="high"] { border-left-color: var(--high); }
+    .finding[data-severity="medium"] { border-left-color: var(--medium); }
+    .finding[data-severity="low"] { border-left-color: var(--low); }
+    .finding[data-severity="advisory"] { border-left-color: var(--advisory); }
+    .finding-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px; }
+    .severity-label { font-size: .78rem; font-weight: 700; text-transform: uppercase; }
+    .severity-label.high { color: var(--high); }
+    .severity-label.medium { color: var(--medium); }
+    .severity-label.low { color: var(--low); }
+    .severity-label.advisory { color: var(--advisory); }
+    .finding-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 18px; margin-top: 12px; }
+    .field-label { display: block; color: var(--neutral-foreground-2); font-size: .78rem; font-weight: 600; }
+    .field-value { display: block; overflow-wrap: anywhere; }
+    .data-table-wrap { overflow-x: auto; }
+    table { width: 100%; min-width: 720px; border-collapse: collapse; }
+    th, td { padding: 10px 12px; border-bottom: 1px solid var(--neutral-stroke-2); text-align: left; vertical-align: top; }
+    th { background: var(--neutral-background-3); color: var(--neutral-foreground-2); font-size: .8rem; font-weight: 700; }
+    tr:last-child td { border-bottom: 0; }
+    .stack { display: grid; gap: 12px; }
+    .empty-state { padding: 18px; border: 1px dashed var(--neutral-stroke-1); color: var(--neutral-foreground-2); }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+    @media (max-width: 980px) { .dashboard-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } .summary-layout { grid-template-columns: 1fr; } }
+    @media (max-width: 620px) { .app-shell { padding: 12px; } .report-header, .panel { padding: 16px; } .dashboard-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .finding-fields { grid-template-columns: 1fr; } }
+    @media print { body { background: #fff; } .app-shell { max-width: none; padding: 0; } .dashboard-grid { grid-template-columns: repeat(5, 1fr); } [role="tablist"] { display: none; } [role="tabpanel"][hidden] { display: block !important; } .finding[hidden] { display: block !important; } .panel, .finding, .report-header { box-shadow: none; break-inside: avoid; } }
+  </style>
+</head>
+<body>
+  <main class="app-shell">
+    <p class="sample-banner">Sample report — "Contoso Travel Desk" is a fictional agent created to demonstrate the report format. All findings, files, and evidence below are illustrative.</p>
+
+    <header class="report-header">
+      <span class="eyebrow">AI compliance assessment</span>
+      <h1>Contoso Travel Desk</h1>
+      <div class="meta">
+        <span>Assessed 5 August 2026</span>
+        <span>Jurisdictions: UK; EU (established — customers intentionally served in Ireland and France)</span>
+        <span>Regimes: EU AI Act; EU &amp; UK GDPR / DPA 2018; UK AI principles; consumer law</span>
+        <span class="badge">YAML + partial tenant evidence; organisational evidence pending</span>
+      </div>
+      <p class="disclaimer">This is a technical compliance assessment, not legal advice. Findings should be validated by qualified legal counsel and the organisation's DPO before being relied upon.</p>
+    </header>
+
+    <section class="dashboard-grid" aria-label="Finding summary">
+      <button class="tile" data-severity="high" type="button" data-target-tab="findings" data-filter="high">
+        <span class="tile-label">High</span><span class="tile-count">1</span><span class="tile-action">View findings</span>
+      </button>
+      <button class="tile" data-severity="medium" type="button" data-target-tab="findings" data-filter="medium">
+        <span class="tile-label">Medium</span><span class="tile-count">2</span><span class="tile-action">View findings</span>
+      </button>
+      <button class="tile" data-severity="low" type="button" data-target-tab="findings" data-filter="low">
+        <span class="tile-label">Low</span><span class="tile-count">1</span><span class="tile-action">View findings</span>
+      </button>
+      <button class="tile" data-severity="advisory" type="button" data-target-tab="findings" data-filter="advisory">
+        <span class="tile-label">Advisory / future readiness</span><span class="tile-count">2</span><span class="tile-action">View findings</span>
+      </button>
+      <button class="tile" type="button" data-target-tab="scope">
+        <span class="tile-label">Evidence required</span><span class="tile-count">6</span><span class="tile-action">View evidence gaps</span>
+      </button>
+    </section>
+
+    <section class="tabs" aria-label="Assessment sections">
+      <div role="tablist" aria-label="Assessment sections">
+        <button role="tab" id="tab-executive" aria-controls="panel-executive" aria-selected="true" tabindex="0" data-tab="executive">Executive summary</button>
+        <button role="tab" id="tab-scope" aria-controls="panel-scope" aria-selected="false" tabindex="-1" data-tab="scope">Scope &amp; evidence</button>
+        <button role="tab" id="tab-findings" aria-controls="panel-findings" aria-selected="false" tabindex="-1" data-tab="findings">Findings</button>
+        <button role="tab" id="tab-data" aria-controls="panel-data" aria-selected="false" tabindex="-1" data-tab="data">Personal-data map</button>
+        <button role="tab" id="tab-remediation" aria-controls="panel-remediation" aria-selected="false" tabindex="-1" data-tab="remediation">Remediation</button>
+        <button role="tab" id="tab-matrix" aria-controls="panel-matrix" aria-selected="false" tabindex="-1" data-tab="matrix">Coverage matrix</button>
+      </div>
+
+      <section role="tabpanel" id="panel-executive" aria-labelledby="tab-executive" data-panel="executive">
+        <div class="summary-layout">
+          <article class="panel"><h2>Executive summary</h2><div class="stack">
+            <p>Contoso Travel Desk is a customer-facing Copilot Studio agent operated by Contoso Travel Ltd (UK-established). It answers booking questions, retrieves reservation status from Dataverse, and raises amendment requests. Customers in Ireland and France are intentionally served, so the EU AI Act Article 2 and EU GDPR Article 3(2)(a) territorial tests are both met alongside UK law.</p>
+            <p>The agent is <strong>not high-risk</strong> under EU AI Act Article 6 / Annex III — it does not make or materially influence any listed decision. Article 50(1) interaction transparency applies from 2 August 2026 and is now in force.</p>
+            <p>One High finding blocks safe go-live: a Dataverse amendment action runs under a maker connection with broad read access while the conversation itself is anonymous. Two Medium findings concern the now-in-force AI disclosure duty and persisted booking data with no observable minimisation control. Six items await tenant or organisational evidence and are not severity-rated.</p>
+            <p><strong>Counts:</strong> 1 High, 2 Medium, 1 Low, 2 Advisory / future readiness, 6 Evidence required.</p>
+          </div></article>
+          <aside class="panel"><h2>Classification</h2><div class="stack">
+            <p><span class="field-label">EU AI Act role</span> Deployer (Contoso Travel Ltd configures and operates; Microsoft provides platform/model). No provider-role trigger identified.</p>
+            <p><span class="field-label">Risk tier</span> Limited risk — Article 50 transparency applies; no Article 5 or Annex III category engaged.</p>
+            <p><span class="field-label">UK framing</span> Five cross-sector principles assessed as regulatory guidance; UK GDPR / DPA 2018 binding.</p>
+            <p><span class="field-label">Data protection</span> EU GDPR and UK GDPR both in scope (dual establishment/targeting).</p>
+          </div></aside>
+        </div>
+      </section>
+
+      <section role="tabpanel" id="panel-scope" aria-labelledby="tab-scope" data-panel="scope" hidden>
+        <article class="panel"><h2>Scope, assumptions &amp; evidence</h2><div class="stack">
+          <h3>Territorial facts (user-confirmed)</h3>
+          <p>Operator established in the UK. Service intentionally offered to customers in the UK, Ireland, and France. Output used where the customer is located. No geographic access restriction configured.</p>
+          <h3>Source evidence inspected</h3>
+          <p><code>agent.mcs.yaml</code>, <code>settings.mcs.yml</code>, <code>connectionreferences.mcs.yml</code>, 14 files in <code>topics/</code> (<code>*.mcs.yaml</code>), 3 files in <code>actions/</code> (<code>*.mcs.yml</code>), 1 trigger in <code>trigger/</code>, 2 workflows in <code>workflows/</code>, 4 knowledge files in <code>knowledge/files/</code>. No <code>variables/</code> folder — current clone layout; recorded as a layout difference, not an evidence gap.</p>
+          <h3>Tenant/runtime evidence received</h3>
+          <p>Screenshot of channel configuration (public website, no authentication) and environment region (Europe).</p>
+          <h3>Evidence required (6 items — not severity-rated)</h3>
+          <div class="data-table-wrap"><table>
+            <thead><tr><th>#</th><th>Evidence</th><th>Type</th><th>Why it matters</th></tr></thead>
+            <tbody>
+              <tr><td>EV-1</td><td>Conversation-transcript saving, access, and retention settings</td><td>Tenant/runtime</td><td>GDPR retention (C6) and security (C8) cannot be assessed from YAML</td></tr>
+              <tr><td>EV-2</td><td>Host-page privacy notice and channel welcome experience</td><td>Tenant/runtime</td><td>Determines whether GDPR Art. 13 transparency (C3) is met at collection</td></tr>
+              <tr><td>EV-3</td><td>Environment / environment-group data policies (connector DLP)</td><td>Tenant/runtime</td><td>Constrains the connector footprint assessed under E5/F3</td></tr>
+              <tr><td>EV-4</td><td>Lawful-basis record for booking-support processing</td><td>Organisational</td><td>C1 cannot be inferred from source files</td></tr>
+              <tr><td>EV-5</td><td>DPIA screening decision or rationale</td><td>Organisational</td><td>C5 applies the likely-high-risk test; the screening record is the evidence</td></tr>
+              <tr><td>EV-6</td><td>Data-subject-rights routing and fulfilment process</td><td>Organisational</td><td>C10 requires an operational process, not YAML content</td></tr>
+            </tbody>
+          </table></div>
+        </div></article>
+      </section>
+
+      <section role="tabpanel" id="panel-findings" aria-labelledby="tab-findings" data-panel="findings" hidden>
+        <div class="panel"><h2>Findings</h2><div class="finding-list">
+
+          <article class="finding" data-severity="high">
+            <div class="finding-head"><h3>CTD-01 — Privileged Dataverse action reachable from anonymous conversation</h3><span class="severity-label high">High</span></div>
+            <div class="finding-fields">
+              <div><span class="field-label">Basis type</span><span class="field-value">Technical control, with UK/EU GDPR Art. 32 exposure (<a href="https://www.legislation.gov.uk/eur/2016/679/article/32">Art. 32</a>)</span></div>
+              <div><span class="field-label">Applicability</span><span class="field-value">Personal data (reservations) is processed; security must be appropriate to risk. Anonymous public channel + maker-credential write action creates an authorization gap.</span></div>
+              <div><span class="field-label">Effective status</span><span class="field-value">In force</span></div>
+              <div><span class="field-label">Evidence</span><span class="field-value"><code>actions/AmendBooking.mcs.yml:12</code> uses connection <code>contoso_dataverse_maker</code>; <code>settings.mcs.yml:8</code> sets authentication to none; channel screenshot confirms public website deployment.</span></div>
+              <div><span class="field-label">Remediation</span><span class="field-value">Require end-user authentication for the amendment path, or replace the maker connection with a least-privilege service identity scoped to the caller's own booking with server-side verification.</span></div>
+              <div><span class="field-label">Owner</span><span class="field-value">Security / Tenant administrator</span></div>
+            </div>
+          </article>
+
+          <article class="finding" data-severity="medium">
+            <div class="finding-head"><h3>CTD-02 — No AI-interaction disclosure (Article 50(1) now in force)</h3><span class="severity-label medium">Medium</span></div>
+            <div class="finding-fields">
+              <div><span class="field-label">Basis type</span><span class="field-value">Binding law — EU AI Act Art. 50(1) (<a href="https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=celex%3A32024R1689">Regulation (EU) 2024/1689</a>)</span></div>
+              <div><span class="field-label">Applicability</span><span class="field-value">EU users are intentionally served; duty applies from 2 August 2026. The branded "Travel Desk" persona does not make the AI nature obvious to a reasonably well-informed, observant and circumspect person.</span></div>
+              <div><span class="field-label">Effective status</span><span class="field-value">In force since 2 August 2026</span></div>
+              <div><span class="field-label">Evidence</span><span class="field-value">Searched <code>topics/Greeting.mcs.yaml</code>, <code>agent.mcs.yaml</code> instructions, and all welcome/fallback topics for disclosure language; no match found. Host-page framing not yet supplied (see EV-2) — rated Medium rather than High pending that context.</span></div>
+              <div><span class="field-label">Remediation</span><span class="field-value">Add a clear first-turn disclosure to the greeting topic (e.g. "I'm Contoso's AI travel assistant") and mirror it in the host-page introduction.</span></div>
+              <div><span class="field-label">Owner</span><span class="field-value">YAML / Operations</span></div>
+            </div>
+          </article>
+
+          <article class="finding" data-severity="medium">
+            <div class="finding-head"><h3>CTD-03 — Booking and contact details persisted with no observable minimisation or retention control</h3><span class="severity-label medium">Medium</span></div>
+            <div class="finding-fields">
+              <div><span class="field-label">Basis type</span><span class="field-value">Binding law — UK/EU GDPR Art. 5(1)(c) and 5(1)(e) (<a href="https://www.legislation.gov.uk/eur/2016/679/article/5">Art. 5</a>)</span></div>
+              <div><span class="field-label">Applicability</span><span class="field-value">The agent collects email, booking reference, and free-text amendment details and writes them to Dataverse; minimisation and storage limitation apply to each field and to transcripts.</span></div>
+              <div><span class="field-label">Effective status</span><span class="field-value">In force</span></div>
+              <div><span class="field-label">Evidence</span><span class="field-value"><code>topics/AmendBooking.mcs.yaml:24-41</code> collects five fields where two are used by the action; <code>workflows/LogRequest/workflow.json</code> writes full conversation text to a custom table. No retention configuration is observable in source (transcript settings pending, EV-1).</span></div>
+              <div><span class="field-label">Remediation</span><span class="field-value">Drop the unused fields, store only the amendment payload rather than full conversation text, and define a retention period for the custom table aligned to the booking lifecycle.</span></div>
+              <div><span class="field-label">Owner</span><span class="field-value">YAML / Privacy</span></div>
+            </div>
+          </article>
+
+          <article class="finding" data-severity="low">
+            <div class="finding-head"><h3>CTD-04 — Fallback topic reveals internal error detail</h3><span class="severity-label low">Low</span></div>
+            <div class="finding-fields">
+              <div><span class="field-label">Basis type</span><span class="field-value">Technical control (UK principle: safety, security and robustness — regulatory guidance)</span></div>
+              <div><span class="field-label">Applicability</span><span class="field-value">Good-practice robustness; no binding provision engaged on these facts.</span></div>
+              <div><span class="field-label">Effective status</span><span class="field-value">Guidance</span></div>
+              <div><span class="field-label">Evidence</span><span class="field-value"><code>topics/Fallback.mcs.yaml:18</code> interpolates the raw connector error message into the user reply.</span></div>
+              <div><span class="field-label">Remediation</span><span class="field-value">Replace with a generic apology and log the detail server-side.</span></div>
+              <div><span class="field-label">Owner</span><span class="field-value">YAML</span></div>
+            </div>
+          </article>
+
+          <article class="finding" data-severity="advisory">
+            <div class="finding-head"><h3>CTD-05 — AI literacy measures not evidenced</h3><span class="severity-label advisory">Advisory</span></div>
+            <div class="finding-fields">
+              <div><span class="field-label">Basis type</span><span class="field-value">Binding law with organisational evidence — EU AI Act Art. 4</span></div>
+              <div><span class="field-label">Applicability</span><span class="field-value">Applies to deployers; evidence is organisational (training records), not YAML. Recorded as advisory pending evidence rather than as a breach.</span></div>
+              <div><span class="field-label">Effective status</span><span class="field-value">In force</span></div>
+              <div><span class="field-label">Evidence</span><span class="field-value">Organisational evidence required — no training or staff-guidance records supplied.</span></div>
+              <div><span class="field-label">Remediation</span><span class="field-value">Document staff AI-literacy measures proportionate to the team operating the agent.</span></div>
+              <div><span class="field-label">Owner</span><span class="field-value">Operations / Legal</span></div>
+            </div>
+          </article>
+
+          <article class="finding" data-severity="advisory">
+            <div class="finding-head"><h3>CTD-06 — Monitor phased EU AI Act obligations through 2027</h3><span class="severity-label advisory">Advisory</span></div>
+            <div class="finding-fields">
+              <div><span class="field-label">Basis type</span><span class="field-value">Future obligation</span></div>
+              <div><span class="field-label">Applicability</span><span class="field-value">Remaining AI Act obligations phase in through 2027; classification should be re-run if the agent gains decision-making, biometric, or emotion-inference capabilities.</span></div>
+              <div><span class="field-label">Effective status</span><span class="field-value">Future dated</span></div>
+              <div><span class="field-label">Evidence</span><span class="field-value">Current capability set from <code>agent.mcs.yaml</code> and <code>settings.mcs.yml</code>; no high-risk trigger today.</span></div>
+              <div><span class="field-label">Remediation</span><span class="field-value">Re-assess on material capability change and at each commencement milestone.</span></div>
+              <div><span class="field-label">Owner</span><span class="field-value">Operations</span></div>
+            </div>
+          </article>
+
+        </div></div>
+      </section>
+
+      <section role="tabpanel" id="panel-data" aria-labelledby="tab-data" data-panel="data" hidden>
+        <article class="panel"><h2>Personal-data map</h2><div class="data-table-wrap">
+          <table>
+            <thead><tr><th>Data element</th><th>Source</th><th>Purpose</th><th>Destination</th><th>Retention</th><th>Evidence</th></tr></thead>
+            <tbody>
+              <tr><td>Email address</td><td>Question node</td><td>Locate booking</td><td>Dataverse (contact match)</td><td>Unverified</td><td><code>topics/AmendBooking.mcs.yaml:24</code></td></tr>
+              <tr><td>Booking reference</td><td>Question node</td><td>Retrieve reservation</td><td>Dataverse query</td><td>Unverified</td><td><code>topics/AmendBooking.mcs.yaml:28</code></td></tr>
+              <tr><td>Free-text amendment details</td><td>User message</td><td>Raise amendment request</td><td>Dataverse custom table (full text)</td><td>Unverified — see CTD-03</td><td><code>workflows/LogRequest/workflow.json</code></td></tr>
+              <tr><td>Full conversation transcripts</td><td>Platform</td><td>Analytics / audit</td><td>Dataverse (platform tables)</td><td>Evidence required (EV-1)</td><td>Platform control — settings not supplied</td></tr>
+              <tr><td>Generated replies &amp; telemetry</td><td>Platform</td><td>Service operation</td><td>Copilot Studio analytics</td><td>Evidence required (EV-1)</td><td>Platform control</td></tr>
+            </tbody>
+          </table>
+        </div></article>
+      </section>
+
+      <section role="tabpanel" id="panel-remediation" aria-labelledby="tab-remediation" data-panel="remediation" hidden>
+        <article class="panel"><h2>Remediation plan</h2><div class="stack">
+          <h3>YAML changes (can be implemented in source)</h3>
+          <p>1. Add first-turn AI disclosure to the greeting topic (CTD-02). 2. Remove unused collected fields and stop persisting full conversation text (CTD-03). 3. Genericise the fallback error message (CTD-04).</p>
+          <h3>Tenant / administrator actions</h3>
+          <p>1. Require authentication or re-scope the amendment action's connection (CTD-01 — go-live blocker). 2. Supply transcript retention settings and DLP policies (EV-1, EV-3). 3. Configure retention for the custom request table (CTD-03).</p>
+          <h3>Organisational actions</h3>
+          <p>1. Publish/confirm host-page privacy notice (EV-2). 2. Record lawful basis and DPIA screening decision (EV-4, EV-5). 3. Document DSR routing and AI-literacy measures (EV-6, CTD-05).</p>
+        </div></article>
+      </section>
+
+      <section role="tabpanel" id="panel-matrix" aria-labelledby="tab-matrix" data-panel="matrix" hidden>
+        <article class="panel"><h2>Coverage matrix</h2><div class="data-table-wrap">
+          <table>
+            <thead><tr><th>Ref</th><th>Requirement</th><th>Basis type</th><th>Applicability</th><th>Effective status</th><th>Evidence status</th><th>Finding / evidence</th></tr></thead>
+            <tbody>
+              <tr><td>A1</td><td>Prohibited practices (Art. 5)</td><td>Binding law</td><td>Applies — EU scope</td><td>In force</td><td>Met</td><td>No manipulative, exploitative, or scoring signal in topics/instructions</td></tr>
+              <tr><td>A2</td><td>High-risk classification (Art. 6, Annex I/III)</td><td>Binding law</td><td>Applies — EU scope</td><td>In force</td><td>Met (not high-risk)</td><td>No listed decision made or materially influenced</td></tr>
+              <tr><td>A3</td><td>Interaction disclosure (Art. 50(1))</td><td>Binding law</td><td>Applies</td><td>In force (2 Aug 2026)</td><td>Shortfall</td><td>CTD-02</td></tr>
+              <tr><td>A4</td><td>Synthetic-content duties (Art. 50)</td><td>Binding law</td><td>N/A — no synthetic media generated</td><td>In force</td><td>N/A</td><td>—</td></tr>
+              <tr><td>A5</td><td>Deployer duties (Art. 26)</td><td>Binding law</td><td>N/A — not high-risk</td><td>In force</td><td>N/A</td><td>Comparable oversight noted as good practice only</td></tr>
+              <tr><td>A6</td><td>AI literacy (Art. 4)</td><td>Binding law</td><td>Applies</td><td>In force</td><td>Organisational evidence required</td><td>CTD-05</td></tr>
+              <tr><td>B1</td><td>Safety, security, robustness</td><td>Guidance</td><td>Applies (UK)</td><td>Guidance</td><td>Shortfall (technical)</td><td>CTD-01, CTD-04</td></tr>
+              <tr><td>B2</td><td>Transparency &amp; explainability</td><td>Guidance</td><td>Applies (UK)</td><td>Guidance</td><td>Shortfall</td><td>CTD-02 (also binding under EU law)</td></tr>
+              <tr><td>B3</td><td>Fairness</td><td>Guidance</td><td>Applies (UK)</td><td>Guidance</td><td>Met</td><td>No differential treatment logic observed</td></tr>
+              <tr><td>B4</td><td>Accountability &amp; governance</td><td>Guidance</td><td>Applies (UK)</td><td>Guidance</td><td>Organisational evidence required</td><td>EV-4, EV-5</td></tr>
+              <tr><td>B5</td><td>Contestability &amp; redress</td><td>Guidance</td><td>Applies (UK)</td><td>Guidance</td><td>Met</td><td>Escalation topic routes to human support (<code>topics/Escalate.mcs.yaml</code>)</td></tr>
+              <tr><td>C1</td><td>Lawful basis per purpose</td><td>Binding law</td><td>Applies (EU+UK)</td><td>In force</td><td>Organisational evidence required</td><td>EV-4</td></tr>
+              <tr><td>C2</td><td>Data minimisation</td><td>Binding law</td><td>Applies</td><td>In force</td><td>Shortfall</td><td>CTD-03</td></tr>
+              <tr><td>C3</td><td>Transparency at collection</td><td>Binding law</td><td>Applies</td><td>In force</td><td>Tenant/runtime evidence required</td><td>EV-2</td></tr>
+              <tr><td>C4</td><td>Solely automated significant decisions</td><td>Binding law</td><td>N/A — human fulfils amendments</td><td>In force</td><td>N/A</td><td>Amendment requests are queued for staff action</td></tr>
+              <tr><td>C5</td><td>DPIA</td><td>Binding law</td><td>Contextual test</td><td>In force</td><td>Organisational evidence required</td><td>EV-5 — screening record requested, not presumed mandatory</td></tr>
+              <tr><td>C6</td><td>Retention &amp; deletion</td><td>Binding law</td><td>Applies</td><td>In force</td><td>Shortfall + evidence required</td><td>CTD-03, EV-1</td></tr>
+              <tr><td>C7</td><td>Special-category data</td><td>Binding law</td><td>Applies to free text</td><td>In force</td><td>Met (design)</td><td>No special-category collection; free-text risk noted in data map</td></tr>
+              <tr><td>C8</td><td>Security (Art. 32)</td><td>Binding law</td><td>Applies</td><td>In force</td><td>Shortfall</td><td>CTD-01</td></tr>
+              <tr><td>C9</td><td>Processors, residency, transfers</td><td>Binding law</td><td>Applies</td><td>In force</td><td>Partially met</td><td>Europe region confirmed; sub-processor list not reviewed</td></tr>
+              <tr><td>C10</td><td>Data-subject rights routing</td><td>Binding law</td><td>Applies</td><td>In force</td><td>Organisational evidence required</td><td>EV-6</td></tr>
+              <tr><td>D1</td><td>Misleading identity/capability</td><td>Binding law</td><td>Applies (consumer-facing)</td><td>In force</td><td>Shortfall (linked)</td><td>CTD-02 — undisclosed AI persona is the same defect</td></tr>
+              <tr><td>D2</td><td>Pre-contract information</td><td>Binding law</td><td>N/A — no contract formed in-agent</td><td>In force</td><td>N/A</td><td>Amendments confirmed by human agents by email</td></tr>
+              <tr><td>D3</td><td>Accessibility / non-discrimination</td><td>Binding law</td><td>Applies</td><td>In force</td><td>Tenant/runtime evidence required</td><td>Host-page accessibility not assessed from YAML</td></tr>
+              <tr><td>E1</td><td>Moderation appropriate to audience</td><td>Technical control</td><td>Applies</td><td>—</td><td>Met</td><td><code>settings.mcs.yml:14</code> moderation high for public audience</td></tr>
+              <tr><td>E2</td><td>Model knowledge vs grounding claims</td><td>Technical control</td><td>Applies</td><td>—</td><td>Met</td><td>General knowledge off; grounded on 4 knowledge files</td></tr>
+              <tr><td>E3</td><td>Generative actions governance</td><td>Technical control</td><td>Applies</td><td>—</td><td>Met</td><td>Generative actions disabled (<code>settings.mcs.yml:19</code>)</td></tr>
+              <tr><td>E4</td><td>Browsing / code / file analysis constrained</td><td>Technical control</td><td>Applies</td><td>—</td><td>Met</td><td>All three disabled</td></tr>
+              <tr><td>E5</td><td>Least-privilege connections</td><td>Technical control</td><td>Applies</td><td>—</td><td>Shortfall</td><td>CTD-01</td></tr>
+              <tr><td>E6</td><td>Authentication appropriate to sensitivity</td><td>Technical control</td><td>Applies</td><td>—</td><td>Shortfall</td><td>CTD-01 — anonymous access with privileged action</td></tr>
+              <tr><td>F1</td><td>Transcript saving/retention</td><td>Technical control</td><td>Applies</td><td>—</td><td>Evidence required</td><td>EV-1</td></tr>
+              <tr><td>F2</td><td>Channels, geo restrictions, host notices</td><td>Technical control</td><td>Applies</td><td>—</td><td>Partially met</td><td>Channel screenshot received; host notices pending (EV-2)</td></tr>
+              <tr><td>F3</td><td>Environment data policies</td><td>Technical control</td><td>Applies</td><td>—</td><td>Evidence required</td><td>EV-3</td></tr>
+              <tr><td>F4</td><td>Maker vs end-user credentials</td><td>Technical control</td><td>Applies</td><td>—</td><td>Shortfall</td><td>CTD-01</td></tr>
+              <tr><td>F5</td><td>Security roles &amp; admin access</td><td>Technical control</td><td>Applies</td><td>—</td><td>Evidence required</td><td>Not supplied</td></tr>
+              <tr><td>F6</td><td>Region, residency, transfers, logging</td><td>Technical control</td><td>Applies</td><td>—</td><td>Partially met</td><td>Europe region confirmed; logging/incident evidence pending</td></tr>
+            </tbody>
+          </table>
+        </div></article>
+      </section>
+    </section>
+  </main>
+
+  <script>
+    (() => {
+      const tabs = [...document.querySelectorAll('[role="tab"]')];
+      const panels = [...document.querySelectorAll('[role="tabpanel"]')];
+      const findings = [...document.querySelectorAll('.finding[data-severity]')];
+      const filterFindings = (filter) => {
+        findings.forEach((finding) => { finding.hidden = Boolean(filter) && finding.dataset.severity !== filter; });
+      };
+      const activate = (name, updateHash = true) => {
+        tabs.forEach((tab) => {
+          const selected = tab.dataset.tab === name;
+          tab.setAttribute('aria-selected', String(selected));
+          tab.tabIndex = selected ? 0 : -1;
+        });
+        panels.forEach((panel) => { panel.hidden = panel.dataset.panel !== name; });
+        if (name !== 'findings') filterFindings(null);
+        if (updateHash) history.replaceState(null, '', `#${name}`);
+      };
+      tabs.forEach((tab, index) => {
+        tab.addEventListener('click', () => activate(tab.dataset.tab));
+        tab.addEventListener('keydown', (event) => {
+          if (!['ArrowRight', 'ArrowLeft', 'Home', 'End'].includes(event.key)) return;
+          event.preventDefault();
+          const next = event.key === 'Home' ? 0 : event.key === 'End' ? tabs.length - 1 : (index + (event.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length;
+          tabs[next].focus();
+          activate(tabs[next].dataset.tab);
+        });
+      });
+      document.querySelectorAll('[data-target-tab]').forEach((tile) => tile.addEventListener('click', () => {
+        filterFindings(tile.dataset.filter || null);
+        activate(tile.dataset.targetTab);
+        document.getElementById('panel-' + tile.dataset.targetTab)?.scrollIntoView({ block: 'start' });
+      }));
+      const initial = location.hash.slice(1);
+      activate(tabs.some((tab) => tab.dataset.tab === initial) ? initial : 'executive', false);
+    })();
+  </script>
+</body>
+</html>

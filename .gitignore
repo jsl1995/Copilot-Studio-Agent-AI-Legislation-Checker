@@ -1,0 +1,9 @@
+# Generated assessment output — reports contain agent-specific and potentially
+# sensitive findings; never commit real assessments.
+reports/
+ai-compliance-report.html
+ai-compliance-report.md
+
+# OS noise
+Thumbs.db
+.DS_Store

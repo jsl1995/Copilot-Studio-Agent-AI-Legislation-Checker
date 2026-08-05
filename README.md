@@ -1,26 +1,70 @@
 # Copilot Studio AI Compliance Skill
 
-An agent skill that assesses a **Microsoft Copilot Studio agent** for compliance with AI legislation. Point it at an unpacked agent (the local YAML produced by cloning an agent) and it produces a severity-ranked compliance report.
+An agent skill that assesses a **Microsoft Copilot Studio agent** for compliance with AI legislation. Point it at an unpacked agent (the local YAML produced by cloning an agent) and it produces a severity-ranked compliance report as a self-contained HTML dashboard.
+
+Unlike checklist tools, it establishes **jurisdiction and legal applicability before scoring** — so it doesn't report regulatory guidance as statutory breaches, and it separates what the YAML proves from what needs tenant or organisational evidence.
 
 ![AI compliance assessment report — Fluent UI dashboard with severity tiles and tabbed sections](assets/report-screenshot.png)
+
+**[▶ View a full sample report](https://htmlpreview.github.io/?https://github.com/jsl1995/Copilot-Studio-Agent-AI-Legislation-Checker/blob/main/examples/sample-report.html)** (fictional agent) or open [`examples/sample-report.html`](examples/sample-report.html) locally.
+
+## Quick start
+
+1. Install the skill (Claude Code, personal scope):
+
+   ```powershell
+   git clone https://github.com/jsl1995/Copilot-Studio-Agent-AI-Legislation-Checker "$env:USERPROFILE\.claude\skills\copilot-studio-ai-compliance"
+   ```
+
+   ```bash
+   git clone https://github.com/jsl1995/Copilot-Studio-Agent-AI-Legislation-Checker ~/.claude/skills/copilot-studio-ai-compliance
+   ```
+
+2. Open Claude Code in the folder containing your **unpacked agent** (see [cloning your agent](#prerequisite-clone-your-agent-locally) if you don't have one yet).
+3. Run:
+
+   ```
+   /copilot-studio-ai-compliance
+   ```
+
+4. Answer the jurisdiction questions (where the organisation is established, which users are targeted, where output is used, whether access is geo-restricted), then review the report saved as `ai-compliance-report.html`.
+
+> ⚠️ **Disclaimer:** this produces a technical compliance assessment, not legal advice. Findings should be validated by qualified legal counsel and your DPO before being relied upon.
+
+## Compatibility
+
+| Host | Status |
+|---|---|
+| Claude Code (CLI / VS Code / desktop) | Tested — primary target |
+| GitHub Copilot agent mode (VS Code, CLI, cloud agent) | Format-compatible via [Agent Skills](#running-the-skill-in-github-copilot) |
+
+Requirements: an unpacked Copilot Studio agent on disk; web search available in the host for verifying current law and for jurisdictions beyond the EU/UK; PowerShell only if you want to run the repo's validation script.
 
 ## What it does
 
 1. **Establishes jurisdiction from operational facts** — where the organisation is established, which users are targeted, where output is used, and whether access is geographically restricted. EU AI Act and GDPR extraterritorial scope are tested separately rather than inferred from UK operation alone.
-2. **Inventories source and external evidence** — `agent.mcs.yml`, settings, topics, actions, variables and connections, plus available tenant/runtime controls such as transcripts, authentication, data policies, connector credentials, channels and retention. It labels YAML-only assessments as incomplete.
+2. **Inventories source and external evidence** — `agent.mcs.yml`/`.yaml`, settings, topics, actions, triggers, workflows, knowledge files, variables and connections, plus available tenant/runtime controls such as transcripts, authentication, data policies, connector credentials, channels and retention. It labels YAML-only assessments as incomplete.
 3. **Classifies the agent** under the EU AI Act (provider vs deployer role, prohibited / high-risk / limited / minimal tier) and the UK's five cross-sector AI principles.
 4. **Applies requirement gates** across the EU AI Act, UK AI principles, EU/UK GDPR & DPA 2018, consumer and equality law, and platform controls. Each item records its basis type, applicability, effective status, and evidence status before it is scored.
 5. **Outputs a self-contained Fluent UI-style HTML dashboard** with:
-   - a first-viewport header and severity tiles in the order High, Medium, Low, followed by Advisory / future readiness and Evidence required
+   - severity tiles in the order High, Medium, Low, followed by Advisory / future readiness and Evidence required
    - accessible tabs for Executive summary, Scope & evidence, Findings, Personal-data map, Remediation, and Coverage matrix
-   - responsive finding cards, evidence states, official links, and a print-friendly layout
-   - a Markdown fallback only when HTML generation is unavailable
-   - **High / Medium / Low** findings for current binding-law or material technical risks, with separate **Advisory / future readiness** items
    - a basis type for every item: binding law, future obligation, regulatory guidance, or technical control
-   - separate tenant/runtime and organisational evidence requests rather than treating unavailable external controls as YAML defects
-   - a coverage-matrix appendix as the audit trail that every in-scope requirement was checked
+   - official-source links, a print-friendly layout, and a coverage-matrix audit trail that every in-scope requirement was checked
+   - a Markdown fallback only when HTML generation is unavailable
 
-> ⚠️ **Disclaimer:** this produces a technical compliance assessment, not legal advice. Findings should be validated by qualified legal counsel and your DPO before being relied upon.
+## Scope and limitations
+
+- **Built-in legal coverage is EU and UK**: EU AI Act, EU GDPR, UCPD, European Accessibility Act; UK AI principles, UK GDPR/DPA 2018, DUAA 2025, Equality Act 2010, DMCC. Other jurisdictions are **research-assisted** — the skill searches official sources live and labels those results "research-based — verify with local counsel".
+- It assesses the **unpacked YAML source** plus whatever tenant/runtime evidence you provide. It does not connect to Copilot Studio, your tenant, or the Power Platform admin centre, and it cannot verify controls it cannot see — a YAML-only run is explicitly labelled as incomplete.
+- It is **not a certification** and not a substitute for a DPIA, legal review, or your organisation's governance process.
+- Legal references are time-sensitive; the skill verifies commencement and amendments against official sources before formal reports, which requires web access.
+
+## Data handling
+
+- The skill and this repo's scripts **do not upload or transmit anything**; the assessment runs entirely inside your AI client, which processes workspace content under its own data policy (check your Claude / GitHub Copilot enterprise settings).
+- The assessment is **read-only**. YAML fixes or tenant changes are only proposed, and only applied with your explicit approval.
+- Generated reports contain security- and privacy-relevant findings about your agent — **treat them as sensitive** and don't commit real assessments to public repos. The repo's `.gitignore` excludes `ai-compliance-report.*` and `reports/` by default.
 
 ## Repository structure
 
@@ -33,33 +77,35 @@ resources/
 assets/
   report-template.html          # Self-contained Fluent UI-style dashboard template
   report-screenshot.png         # Example report dashboard (shown above)
+examples/
+  sample-report.html            # Full sample report for a fictional agent
 evals/
   cases.json                    # Regression scenarios for scope, applicability, severity and evidence
 scripts/
-  validate-skill.ps1           # Deterministic content-contract checks
+  validate-skill.ps1            # Deterministic content-contract checks
 ```
 
 ## Prerequisite: clone your agent locally
 
-The skill works on the **unpacked YAML source** of a Copilot Studio agent — a folder containing `agent.mcs.yml`, `settings.mcs.yml`, and `topics/`, `actions/`, `variables/` subfolders.
+The skill works on the **unpacked YAML source** of a Copilot Studio agent — a folder containing `agent.mcs.yml` or `agent.mcs.yaml` plus its component folders. Current clones from the VS Code extension look like this (extensions vary between `.mcs.yml` and `.mcs.yaml` — the skill accepts both, and older clones with a `variables/` folder are also supported):
+
+```
+MyAgent/
+  agent.mcs.yaml                 # main agent definition
+  settings.mcs.yml               # configuration settings
+  connectionreferences.mcs.yml   # connection references
+  topics/*.mcs.yaml              # conversation topics
+  actions/*.mcs.yml              # connector actions
+  trigger/*.mcs.yaml             # event triggers
+  workflows/<name>/              # tools/workflows (metadata.yaml + workflow.json)
+  knowledge/                     # knowledge sources
+```
 
 ### Option A — Microsoft Copilot Studio extension for VS Code
 
 1. Install the **Microsoft Copilot Studio** extension from the VS Code marketplace.
 2. Sign in with an account that has access to the Power Platform environment hosting the agent.
-3. Open the Command Palette (`Ctrl+Shift+P`) → **Copilot Studio: Clone agent** (or use the Copilot Studio panel).
-4. Pick the environment, pick the agent, and choose a local folder.
-5. You should end up with a structure like:
-
-```
-MyAgent/
-  agent.mcs.yml
-  settings.mcs.yml
-  connectionreferences.mcs.yml
-  topics/*.mcs.yml
-  actions/*.mcs.yml
-  variables/*.mcs.yml
-```
+3. Open the Copilot Studio pane, pick the environment, right-click the agent → **Clone agent**, and choose a local folder. (Or use the Command Palette: **Copilot Studio: Clone Agent**.)
 
 ### Option B — Claude Code with the Copilot Studio plugin
 
@@ -73,64 +119,49 @@ and follow the prompts (environment selection → agent selection → local fold
 
 ## Running the skill in Claude Code
 
-1. Copy this repo's contents into a skills folder:
-   - **Personal (all projects):** `~/.claude/skills/copilot-studio-ai-compliance/`
-   - **Project-scoped:** `<your-repo>/.claude/skills/copilot-studio-ai-compliance/`
+The [quick start](#quick-start) above installs to your personal skills folder (available in all projects). For a project-scoped install, clone into `<your-repo>/.claude/skills/copilot-studio-ai-compliance/` instead.
 
-   ```powershell
-   git clone https://github.com/jsl1995/Copilot-Studio-Agent-AI-Legislation-Checker "$env:USERPROFILE\.claude\skills\copilot-studio-ai-compliance"
-   ```
+Verify the install by typing `/` in Claude Code — `copilot-studio-ai-compliance` should appear in the skill list. Then invoke it from your unpacked-agent folder, or just ask naturally: *"Run an AI compliance review of this agent."*
 
-   ```bash
-   git clone https://github.com/jsl1995/Copilot-Studio-Agent-AI-Legislation-Checker ~/.claude/skills/copilot-studio-ai-compliance
-   ```
-
-2. Start Claude Code in (or navigate to) the folder containing your unpacked agent.
-3. Invoke the skill:
-
-   ```
-   /copilot-studio-ai-compliance
-   ```
-
-   or just ask naturally: *"Run an AI compliance review of this agent."*
-
-4. Answer the jurisdiction and operational-scope questions when prompted, then review the HTML dashboard. The skill will offer to save it as `ai-compliance-report.html`; it only uses `ai-compliance-report.md` as a fallback or companion when requested.
+To update later, `git pull` in the skills folder. To uninstall, delete the folder.
 
 ## Running the skill in GitHub Copilot
 
-GitHub Copilot (VS Code) has rolling support for the Agent Skills format; where it isn't available yet, the prompt-file route below works everywhere.
+GitHub Copilot supports the Agent Skills format in VS Code agent mode, Copilot CLI, the Copilot cloud agent, and code review. Install the complete skill folder (it needs `SKILL.md`, `resources/`, **and** `assets/` — the HTML template is required for the primary report output) into one of the supported locations:
 
-### Option A — Agent Skills support (where available)
+- **Project:** `<your-repo>/.github/skills/copilot-studio-ai-compliance/`
+- **Personal:** `~/.copilot/skills/copilot-studio-ai-compliance/`
 
-Copy the skill into your repository so Copilot's agent mode can discover it:
-
-```
-<your-repo>/.github/skills/copilot-studio-ai-compliance/SKILL.md
-<your-repo>/.github/skills/copilot-studio-ai-compliance/resources/...
+```bash
+git clone https://github.com/jsl1995/Copilot-Studio-Agent-AI-Legislation-Checker ~/.copilot/skills/copilot-studio-ai-compliance
 ```
 
-Then, in Copilot Chat (Agent mode), ask: *"Assess this agent for AI legislation compliance using the copilot-studio-ai-compliance skill."*
-
-### Option B — Prompt file (works today in any Copilot Chat)
-
-1. Copy `SKILL.md` and the `resources/` folder into your repo, e.g. under `.github/prompts/`, renaming `SKILL.md` to `copilot-studio-ai-compliance.prompt.md` (keep `resources/` next to it and strip the YAML frontmatter if Copilot complains).
-2. Open your unpacked agent folder in VS Code.
-3. In Copilot Chat run the prompt file (`/copilot-studio-ai-compliance` in chat, or attach it via *Add Context → Prompt…*), or simply attach `SKILL.md` as context (`#file`) and say: *"Follow these instructions to assess the agent in this workspace."*
+Then, in Copilot Chat (agent mode) with your unpacked agent open, ask: *"Assess this agent for AI legislation compliance using the copilot-studio-ai-compliance skill."*
 
 Notes for Copilot users:
 
 - The skill's interactive region question becomes a plain chat question — answer it in the conversation.
-- For regions other than UK/EU the skill relies on web research; enable Copilot's web search tool (`#fetch`/web search in agent mode) or supply the relevant legislation yourself.
+- For regions other than UK/EU the skill relies on web research; enable Copilot's web search tool or supply the relevant legislation yourself.
 
-## Example findings (from a real assessment)
+## How findings are calibrated
 
-| Severity | Finding | Legislation |
-|---|---|---|
-| Contextual | No AI disclosure | Article 50 shortfall only when territorial scope, responsible role, effective date and the interaction test establish the duty; otherwise future readiness or guidance |
-| Contextual | Placeholder escalation address | Binding-law severity only where an applicable redress or automated-decision safeguard requires it; otherwise a technical or guidance gap |
-| Technical | Low moderation on a public agent | Risk-rate against audience, use case and tested safety controls; do not present the setting alone as a statutory breach |
-| Contextual | Automated rejection without human review | Apply automated-decision law only when the decision is solely automated and legally or similarly significant |
+The skill's core design goal is avoiding false positives: the same observation lands at a different severity depending on jurisdiction, dates, role, and audience. Examples of what a report actually contains:
+
+| Example finding | How it's rated |
+|---|---|
+| No AI disclosure in an EU-facing chatbot | **High/Medium** binding-law finding only once EU AI Act Art. 50(1) is in force, applies territorially, and the AI nature isn't obvious to users; before commencement it's an **Advisory / future readiness** item |
+| Anonymous public agent invoking a privileged Dataverse action with maker credentials | **High** technical security finding — conversation authentication and connector authorization are assessed separately |
+| No privacy notice found in the YAML | **Evidence required** — the host page and channel experience must be checked before it can become a GDPR transparency finding |
+| Automated rejection of a request with no human review | A binding automated-decision finding only when the decision is solely automated and legally significant; otherwise a guidance-level concern |
+
+Every finding cites its legal basis with an official-source link, the applicability test that was met, and the evidence (file and line where possible).
 
 ## Keeping it current
 
 The reference files were updated in **July 2026**. EU AI Act obligations phase in through 2027 and UK legislation and guidance continue to evolve. The skill requires current official-source verification of territorial scope, commencement and amendments before formal deliverables, and live research for jurisdictions beyond the EU/UK.
+
+If you change jurisdiction, applicability, severity, or evidence rules, run the regression scenarios in `evals/cases.json` and `scripts/validate-skill.ps1`.
+
+## License
+
+[MIT](LICENSE) — free to use, modify, and redistribute, including commercially. Attribution appreciated.

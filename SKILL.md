@@ -11,19 +11,25 @@ Assess Microsoft Copilot Studio agents as an AI governance specialist. Ground ev
 
 ## Step 0 - Locate the agent and define the evidence boundary
 
-Find the unpacked agent root containing `agent.mcs.yml`. If several candidates exist, ask the user which one to assess.
+Find the unpacked agent root containing `agent.mcs.yml` **or** `agent.mcs.yaml`. If several candidates exist, ask the user which one to assess.
+
+Clone layouts vary by extension version and mix extensions within one clone (for example `agent.mcs.yaml` beside `settings.mcs.yml`, and `topics/*.mcs.yaml` beside `actions/*.mcs.yml`). Treat `.mcs.yml` and `.mcs.yaml` as equivalent everywhere, inventory every folder actually present, and note unrecognized files in the report rather than skipping them.
 
 Inventory the source evidence:
 
 | File(s) | Signals to extract |
 |---|---|
-| `agent.mcs.yml` | Purpose, persona, instructions, PII handling, escalation, injection resilience, grounding, fallback rules, model capabilities |
-| `settings.mcs.yml` | Authentication, access policy, moderation, model knowledge, file analysis, generative actions, connectability, language |
-| `topics/*.mcs.yml` | Disclosure, data collection, automated decisions, escalation, errors, confirmation and consent steps |
-| `actions/*.mcs.yml` | External destinations, data written or retrieved, filters, action authorization, connector use |
-| `variables/*.mcs.yml` | Declared and persisted data fields |
-| `connectionreferences.mcs.yml`, `.mcs/conn.json` | Connector footprint and declared data-flow destinations |
-| Knowledge source files | Grounding scope, source sensitivity, copyright and access implications |
+| `agent.mcs.yml` / `agent.mcs.yaml` | Purpose, persona, instructions, PII handling, escalation, injection resilience, grounding, fallback rules, model capabilities |
+| `settings.mcs.yml` / `settings.mcs.yaml` | Authentication, access policy, moderation, model knowledge, file analysis, generative actions, connectability, language |
+| `topics/*.mcs.yml` / `*.mcs.yaml` | Disclosure, data collection, automated decisions, escalation, errors, confirmation and consent steps |
+| `actions/*.mcs.yml` / `*.mcs.yaml` | External destinations, data written or retrieved, filters, action authorization, connector use |
+| `workflows/*/metadata.yaml`, `workflows/*/workflow.json` | Tool and workflow definitions, external destinations, data written or retrieved, autonomous invocation |
+| `trigger/*.mcs.yml` / `*.mcs.yaml` | Event triggers and non-conversational invocation paths |
+| `variables/*.mcs.yml` / `*.mcs.yaml` (older layouts) | Declared and persisted data fields |
+| `connectionreferences.mcs.yml` / `.yaml`, `.mcs/conn.json` | Connector footprint and declared data-flow destinations |
+| `knowledge/` files (for example `knowledge/files/*.yaml`) | Grounding scope, source sensitivity, copyright and access implications |
+
+A missing folder from one layout generation (for example no `variables/` in a current clone, or no `workflows/` in an older one) is a layout difference, not an evidence gap.
 
 Request or identify tenant/runtime evidence when available:
 

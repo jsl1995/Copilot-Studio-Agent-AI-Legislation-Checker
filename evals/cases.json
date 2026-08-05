@@ -113,6 +113,19 @@
       ]
     },
     {
+      "id": "mixed-clone-layout-discovery",
+      "scenario": "An agent freshly cloned with the current VS Code extension contains agent.mcs.yaml, settings.mcs.yml, topics/*.mcs.yaml, actions/*.mcs.yml, trigger/*.mcs.yaml, workflows/<name>/workflow.json with metadata.yaml, and knowledge/files/*.yaml. There is no variables/ folder and no agent.mcs.yml.",
+      "expected": [
+        "Locate the agent root via agent.mcs.yaml, treating .mcs.yml and .mcs.yaml as equivalent.",
+        "Inventory topics, actions, triggers, workflows, knowledge files, and connection references across both extensions.",
+        "Record the absent variables/ folder as a layout difference rather than an evidence gap."
+      ],
+      "must_not": [
+        "Report that no agent was found because agent.mcs.yml is absent.",
+        "Skip trigger, workflow, or knowledge files because they do not match *.mcs.yml."
+      ]
+    },
+    {
       "id": "html-dashboard-output",
       "scenario": "The assessment runtime can create files and is asked to produce the compliance report.",
       "expected": [

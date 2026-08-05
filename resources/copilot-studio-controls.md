@@ -1,4 +1,4 @@
-# Copilot Studio Runtime Controls Reference (updated July 2026)
+# Copilot Studio Runtime Controls Reference (updated August 2026)
 
 Use this reference to identify controls that unpacked agent YAML cannot establish. Verify current Microsoft Learn documentation before a formal deliverable because Copilot Studio settings and source schemas change frequently.
 
@@ -12,6 +12,8 @@ Use this reference to identify controls that unpacked agent YAML cannot establis
 | Maker-provided connector credentials | https://learn.microsoft.com/microsoft-copilot-studio/configure-no-maker-authentication |
 | Personal-data export | https://learn.microsoft.com/microsoft-copilot-studio/personal-data-export |
 | Session transcript contents | https://learn.microsoft.com/microsoft-copilot-studio/analytics-transcripts-studio |
+| Transcript retention period (Dataverse) | https://learn.microsoft.com/microsoft-copilot-studio/analytics-transcripts-powerapps |
+| Audit logging in Microsoft Purview | https://learn.microsoft.com/microsoft-copilot-studio/admin-logging-copilot-studio |
 
 ## Evidence boundary
 
@@ -23,12 +25,14 @@ Do not mark an external control as absent merely because it is not represented i
 
 ### Conversation data
 
-- Whether conversation transcripts and associated metadata are saved to Dataverse
-- Transcript retention period and deletion behavior
-- Roles allowed to view or download transcripts
+- Whether conversation transcripts and associated metadata are saved to Dataverse (saving is on by default and admin-controllable per environment or environment group)
+- Transcript retention period and deletion behavior — the default Dataverse retention is 30 days via a recurring bulk-delete job, which admins can cancel or replace to lengthen or shorten retention
+- Whether the environment type writes transcripts at all — transcripts are not written for Dataverse for Teams environments, Dataverse developer environments, or Microsoft 365 Copilot agents
+- Roles allowed to view or download transcripts (viewing in Power Apps requires the Bot Transcript Viewer security role, granted by admins)
 - Environment-group settings that override individual environment settings
 - Analytics or external exports containing messages, metadata, feedback, or generated content
-- Whether SharePoint grounding content is included in transcript fields
+- Whether SharePoint grounding content is included in transcript fields (when SharePoint is a knowledge source, transcripts include the question and retrieved source content in `search_results`, while the generated answer is redacted)
+- Purview audit-log coverage of maker, admin, and user activity, and any retention policies applied to audit records
 
 Treat free-form user input as potential personal data even when it is never assigned to an authored variable.
 

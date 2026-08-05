@@ -1,4 +1,4 @@
-# EU AI & Data Legislation Reference (updated July 2026)
+# EU AI & Data Legislation Reference (updated August 2026)
 
 Supporting reference for the `copilot-studio-ai-compliance` skill. Cite findings using the instrument and article with the official links below. Verify territorial scope, current consolidated text, and commencement before formal deliverables.
 
@@ -16,14 +16,28 @@ When citing an AI Act article in a finding, link the EUR-Lex page and name the a
 
 ## 1. EU AI Act — Regulation (EU) 2024/1689
 
-Entered into force 1 August 2024. Phased application:
+Entered into force 1 August 2024. Phased application, **as amended by the 2026 Digital Omnibus on AI** (see below):
 
 | Date | What applies |
 |---|---|
 | 2 Feb 2025 | Prohibited practices (Art 5); AI literacy (Art 4) |
 | 2 Aug 2025 | GPAI model obligations; governance; penalties |
-| 2 Aug 2026 | Most remaining obligations incl. Art 50 transparency and Annex III high-risk |
-| 2 Aug 2027 | High-risk AI embedded in regulated products (Annex I) |
+| 2 Aug 2026 | Art 50 transparency and most remaining non-high-risk obligations — **now in force** |
+| 2 Dec 2026 | End of grace period for Art 50(2) machine-readable marking for systems already on the market before 2 Aug 2026; end of transitional period for the new Art 5 NCII/CSAM prohibition |
+| 2 Dec 2027 | Standalone Annex III high-risk obligations (deferred from 2 Aug 2026 by the Digital Omnibus) |
+| 2 Aug 2028 | High-risk AI embedded in regulated products, Annex I (deferred from 2 Aug 2027) |
+
+### Digital Omnibus on AI (2026 amendment) — verify before citing dates
+
+The European Parliament endorsed the Digital Omnibus on AI on 16 June 2026 and the Council gave final approval on 29 June 2026 ([Council press release](https://www.consilium.europa.eu/en/press/press-releases/2026/06/29/artificial-intelligence-council-gives-final-green-light-to-simplify-and-streamline-rules/)). Key changes relevant to this skill:
+
+- Standalone Annex III high-risk obligations deferred to **2 December 2027**; Annex I embedded high-risk to **2 August 2028**.
+- Article 50 interaction-disclosure duties were **not** deferred and apply from 2 August 2026. A grace period to 2 December 2026 covers Art 50(2) machine-readable marking for systems already on the market before 2 August 2026.
+- A revised Article 5 adds a prohibition on AI systems generating non-consensual intimate imagery or CSAM (transitional period to 2 December 2026).
+- Article 4 AI-literacy duties were softened from ensuring literacy to support-measure obligations.
+- The AI Office gains investigative and enforcement powers; regulatory-sandbox deadlines move to 2 August 2027.
+
+**Verify the amending regulation's Official Journal citation and consolidated text before formal deliverables** — cite the consolidated Regulation (EU) 2024/1689 as amended, not the pre-amendment commencement dates.
 
 ### Territorial scope (Art 2) — extraterritorial reach
 The Act applies to the actors listed in Article 2. Article 2(1)(c) includes providers and deployers established in a third country where output produced by the AI system is used in the EU. Establish actual or intended EU use from deployment, users, contracts, channels, and operational facts. Technical reachability from the EU alone does not prove that output is used there; record uncertain exposure as conditional rather than declaring the Act applicable.
@@ -38,16 +52,18 @@ Subliminal or purposefully manipulative techniques causing significant harm; exp
 ### Art 6 + Annex III — High-risk areas (summary)
 Biometrics; critical infrastructure; education & vocational training; **employment/worker management**; access to essential private & public services (incl. credit scoring, insurance pricing, emergency dispatch); law enforcement; migration/border; justice & democratic processes. A system is high-risk if it is a safety component of these or makes/materially influences such decisions. Art 6(3) carve-out: narrow procedural tasks, improving prior human activity, etc. — must be documented.
 
-### Art 50 — Transparency (generally applies from 2 August 2026)
-- 50(1): providers must ensure that systems intended to interact directly with natural persons inform them that they are interacting with AI, unless this is obvious to a reasonably well-informed, observant, and circumspect person in the circumstances. Check the responsible role, effective date, complete user experience, and the exception rather than treating an exact greeting phrase as the statutory test.
-- 50(2): synthetic audio/image/video/text content must be marked machine-readably (provider duty).
+Classification still matters now, but the substantive high-risk obligations apply from **2 December 2027** (standalone Annex III) / **2 August 2028** (Annex I embedded) following the Digital Omnibus deferral — report high-risk gaps as future obligations with those dates, not as current breaches.
+
+### Art 50 — Transparency (generally applies from 2 August 2026 — now in force)
+- 50(1): providers must ensure that systems intended to interact directly with natural persons inform them that they are interacting with AI, unless this is obvious to a reasonably well-informed, observant, and circumspect person in the circumstances. Check the responsible role, effective date, complete user experience, and the exception rather than treating an exact greeting phrase as the statutory test. Not deferred by the Digital Omnibus — assess as binding law for in-scope systems.
+- 50(2): synthetic audio/image/video/text content must be marked machine-readably (provider duty). Grace period to 2 December 2026 for systems already on the market before 2 August 2026.
 - 50(4): deployers of deep fakes / AI text published to inform the public must disclose.
 
 ### Art 26 — Deployer obligations for high-risk AI systems
 Article 26 duties apply to deployers of high-risk AI systems. They include use according to instructions, competent human oversight, relevant and sufficiently representative input data where controlled by the deployer, monitoring, logs, notices, and incident cooperation. For non-high-risk agents, similar controls may be useful good practice but must not be described as mandatory Article 26 duties.
 
 ### Art 4 — AI literacy
-Providers and deployers must ensure sufficient AI literacy of staff operating AI systems. Organisational evidence: training records, usage guidance.
+Providers and deployers must take measures to support sufficient AI literacy of staff operating AI systems (softened by the Digital Omnibus from an ensure-literacy duty to support-measure obligations — verify the consolidated wording). Organisational evidence: training records, usage guidance.
 
 ### Penalties (Art 99)
 Up to €35m / 7% global turnover (prohibited practices); €15m / 3% (most other obligations).

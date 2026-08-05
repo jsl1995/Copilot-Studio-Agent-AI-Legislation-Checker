@@ -1,3 +1,5 @@
+# Deterministic content-contract checks for the copilot-studio-ai-compliance skill.
+# Cross-platform equivalent: validate-skill.py — keep the two scripts' assertions in sync.
 param(
     [string]$Root = (Split-Path -Parent $PSScriptRoot)
 )

@@ -158,7 +158,7 @@ Every finding cites its legal basis with an official-source link, the applicabil
 
 ## Keeping it current
 
-The reference files were updated in **July 2026**. EU AI Act obligations phase in through 2027 and UK legislation and guidance continue to evolve. The skill requires current official-source verification of territorial scope, commencement and amendments before formal deliverables, and live research for jurisdictions beyond the EU/UK.
+The reference files were updated in **August 2026** and reflect the 2026 Digital Omnibus on AI (Article 50 transparency in force from 2 August 2026; standalone Annex III high-risk obligations deferred to 2 December 2027, Annex I embedded to 2 August 2028) and the DUAA 2025 commencement position. EU AI Act obligations continue phasing in through 2028 and UK legislation and guidance continue to evolve. The skill requires current official-source verification of territorial scope, commencement and amendments before formal deliverables, and live research for jurisdictions beyond the EU/UK.
 
 If you change jurisdiction, applicability, severity, or evidence rules, run the regression scenarios in `evals/cases.json` and `scripts/validate-skill.ps1`.
 

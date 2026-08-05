@@ -1,4 +1,4 @@
-# UK AI & Data Legislation Reference (updated July 2026)
+# UK AI & Data Legislation Reference (updated August 2026)
 
 Supporting reference for the `copilot-studio-ai-compliance` skill. Cite findings using the instrument and section with the official links below. Verify current law, commencement, and regulator guidance before formal deliverables.
 
@@ -11,6 +11,7 @@ Supporting reference for the `copilot-studio-ai-compliance` skill. Cite findings
 | UK GDPR (retained Regulation (EU) 2016/679) | https://www.legislation.gov.uk/eur/2016/679/contents |
 | Data Protection Act 2018 | https://www.legislation.gov.uk/ukpga/2018/12/contents |
 | Data (Use and Access) Act 2025 | https://www.legislation.gov.uk/ukpga/2025/18/contents |
+| DUAA 2025 (Commencement No. 6) Regulations 2026 — SI 2026/82 | https://www.legislation.gov.uk/uksi/2026/82/contents/made |
 | Equality Act 2010 | https://www.legislation.gov.uk/ukpga/2010/15/contents |
 | Digital Markets, Competition and Consumers Act 2024 | https://www.legislation.gov.uk/ukpga/2024/13/contents |
 | Consumer Rights Act 2015 | https://www.legislation.gov.uk/ukpga/2015/15/contents |
@@ -33,13 +34,20 @@ No single cross-sector AI act is in force. The 2023 white paper sets five cross-
 
 The principles are non-statutory and context-specific. Do not cite a principle alone as proof of a legal breach. Identify the binding law, sector rule, or regulator power that applies; otherwise label the finding regulatory guidance or good practice.
 
-Watch for new UK AI legislation or regulator rules after July 2026 and verify them before formal deliverables.
+As of August 2026 there is still no cross-sector UK AI act, and none is currently expected imminently. Relevant developments to check when assessing:
+
+- The King's Speech 2026 announced a **Regulating for Growth Bill** putting regulatory sandboxes on a statutory footing (verify its progress and whether it affects the assessed sector).
+- The **Crime and Policing Act 2026** (Royal Assent 29 April 2026) contains AI- and online-safety-related provisions — check relevance for public-facing agents.
+- In January 2026 the government asked major regulators to publish plans for enabling safe AI innovation — check the relevant sector regulator's current AI guidance.
+- A private member's Artificial Intelligence (Regulation) Bill remains before Parliament but is not law.
+
+Verify any post-August 2026 legislation or regulator rules before formal deliverables.
 
 ## 2. UK GDPR + Data Protection Act 2018
 
 Same core structure as EU GDPR. Key AI-specific points:
 
-- **Automated decision-making (UK GDPR Articles 22A–22D, inserted by section 80 of the Data (Use and Access) Act 2025)**: section 80 commenced on 5 February 2026. Significant decisions based solely on automated processing require safeguards including information, representations, human intervention, and contestability. Additional restrictions apply to special-category data. Verify the current consolidated text and any regulations made under the new powers.
+- **Automated decision-making (UK GDPR Articles 22A–22D, inserted by section 80 of the Data (Use and Access) Act 2025)**: section 80 commenced on 5 February 2026 via the Commencement No. 6 Regulations ([SI 2026/82](https://www.legislation.gov.uk/uksi/2026/82/contents/made)), which brought the principal DUAA data-protection provisions into force; further provisions commenced 19 June 2026 and some ICO governance provisions follow later. Articles 22A–22D replace the former Article 22 prohibition with a permission-plus-safeguards model: significant decisions based solely on automated processing require safeguards including information, representations, human intervention, and contestability, with stricter rules where special-category data is used. Verify the current consolidated text and any regulations made under the new powers.
 - **ICO guidance**: use "Guidance on AI and data protection", "Explaining decisions made with AI", and current DPIA guidance. A DPIA is required where processing is likely to result in high risk. Innovative technology generally requires a DPIA when combined with another relevant risk criterion or when the circumstances otherwise meet the statutory test.
 
 ### Essentials for a data-collecting agent

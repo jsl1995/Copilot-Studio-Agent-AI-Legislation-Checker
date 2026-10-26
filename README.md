@@ -161,7 +161,7 @@ Every finding cites its legal basis with an official-source link, the applicabil
 
 The reference files were updated in **August 2026** and reflect the 2026 Digital Omnibus on AI (Article 50 transparency in force from 2 August 2026; standalone Annex III high-risk obligations deferred to 2 December 2027, Annex I embedded to 2 August 2028) and the DUAA 2025 commencement position. EU AI Act obligations continue phasing in through 2028 and UK legislation and guidance continue to evolve. The skill requires current official-source verification of territorial scope, commencement and amendments before formal deliverables, and live research for jurisdictions beyond the EU/UK.
 
-If you change any skill file, run the content-contract validator with whichever runtime you have — `python3 scripts/validate-skill.py` or `.\scripts\validate-skill.ps1`. When changing jurisdiction, applicability, severity, or evidence rules, also regression-test against the scenarios in `evals/cases.json`: run the skill against each scenario (or reason through it) and check the output meets every `expected` item and none of the `must_not` items — these are judgement-based checks, not automated ones.
+If you change any skill file, run the content-contract validator with whichever runtime you have — `python3 scripts/validate-skill.py` or `.\scripts\validate-skill.ps1`. When changing jurisdiction, applicability, severity, or evidence rules, also regression-test against the scenarios in `evals/cases.json`: run the skill against each scenario (or reason through it) and check the output meets every `expected` item and none of the `must_not` items — these are judgement-based checks, not automated ones. Record any deliberate behaviour change by updating the affected case.
 
 ## License
 

@@ -63,8 +63,15 @@ assert_not_contains("skill", r"Every shortfall becomes", "automatic severity con
 assert_not_contains("skill", r"Use AskUserQuestion", "runtime-specific interaction tool")
 assert_not_contains("skill", r"\*\*Legislation:\*\*", "mandatory legislation field for non-legal findings")
 
+assert_contains("skill", r"(?m)^description: Use when [^\n]{0,480}$", "trigger-only description under 500 characters")
+assert_not_contains("skill", r"(?m)^## Evaluation", "maintainer evaluation section in runtime skill")
+assert_not_contains("skill", r"Verify that dashboard counts equal the finding cards", "ambiguous evidence-required tile count")
+assert_contains("skill", r"Evidence required\*\* tile counts the evidence-required rows", "evidence-required tile count source")
+
 assert_contains("eu", r"Technical reachability from the EU alone does not prove", "conditional EU AI Act scope")
 assert_contains("eu", r"generally applies from 2 August 2026", "Article 50 commencement")
+assert_contains("eu", r"Representative \(Art 27\)", "EU GDPR Art 27 representative")
+assert_contains("uk", r"Representative \(UK GDPR Art 27\)", "UK GDPR Art 27 representative")
 assert_contains("uk", r"The principles are non-statutory", "UK guidance status")
 assert_contains("uk", r"section 80 commenced on 5 February 2026", "DUAA commencement")
 assert_contains("platform", r"transcripts and associated metadata are saved to Dataverse", "transcript evidence checklist")
@@ -84,6 +91,10 @@ assert_contains("template", r"filterFindings", "severity tile filtering")
 assert_contains("template", r'data-target-tab="scope"', "evidence tile scope target")
 assert_contains("template", r"Regimes: \{\{REGIMES\}\}", "header regimes slot")
 assert_not_contains("template", r"<script[^>]+src=", "template external script dependency")
+assert_contains("template", r"activate = \(name, updateHash = true, filter = null\)", "tab activation resets the severity filter")
+assert_contains("template", r"data-empty-state", "empty state for a severity with no findings")
+assert_contains("skill", r"\.mcs/botdefinition\.json", "botdefinition.json inventory")
+assert_contains("skill", r"knowledge/\*\.topic\.\*\.mcs\.yml", "topic-named knowledge source inventory")
 
 evals = json.loads(text["evals"])
 cases = evals.get("cases") or []

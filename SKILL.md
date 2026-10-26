@@ -1,6 +1,6 @@
 ---
 name: copilot-studio-ai-compliance
-description: Assess an unpacked Microsoft Copilot Studio agent (agent.mcs.yml plus topics, actions, variables, and available environment evidence) against applicable AI, data-protection, consumer, and equality requirements. Establish jurisdiction and legal applicability before scoring; distinguish binding law, future obligations, regulatory guidance, and technical controls; and report YAML-observable findings separately from tenant or organisational evidence gaps. Use for requests such as "AI compliance review", "EU AI Act check", "is this agent compliant", "AI legislation assessment", or "regulatory review of this agent/copilot".
+description: Use when asked to assess an unpacked Microsoft Copilot Studio agent (agent.mcs.yml/.yaml clone) for AI-legislation, EU AI Act, GDPR/UK GDPR, consumer, or equality compliance, for example "AI compliance review", "EU AI Act check", "is this agent compliant", "AI legislation assessment", or "regulatory review of this agent/copilot". Not for editing agent YAML (use the copilot-studio plugin skills) or scoring instruction quality (use copilot-studio-instruction-audit).
 license: MIT (see LICENSE)
 ---
 
@@ -28,7 +28,8 @@ Inventory the source evidence:
 | `trigger/*.mcs.yml` / `*.mcs.yaml` | Event triggers and non-conversational invocation paths |
 | `variables/*.mcs.yml` / `*.mcs.yaml` (older layouts) | Declared and persisted data fields |
 | `connectionreferences.mcs.yml` / `.yaml`, `.mcs/conn.json` | Connector footprint and declared data-flow destinations |
-| `knowledge/` files (for example `knowledge/files/*.yaml`) | Grounding scope, source sensitivity, copyright and access implications |
+| `knowledge/` files (for example `knowledge/files/*.yaml`, `knowledge/*.knowledge.mcs.yml`, and `knowledge/*.topic.*.mcs.yml` files whose `kind` is `KnowledgeSourceConfiguration`) | Grounding scope, source sensitivity, copyright and access implications; duplicate or unlisted sources compared with the instructions |
+| `.mcs/botdefinition.json` | Component inventory and state (active or inactive), publish metadata |
 
 A missing folder from one layout generation (for example no `variables/` in a current clone, or no `workflows/` in an older one) is a layout difference, not an evidence gap.
 
@@ -222,7 +223,7 @@ Build the first viewport as a quiet, information-dense Fluent UI-style dashboard
 - Render each finding as a semantic `article` or card with its ID, severity, basis type, applicability, effective status, evidence, remediation, owner, and official links. Use text labels in addition to colour.
 - Keep the coverage matrix searchable or horizontally scrollable on small screens. Ensure tables, cards, tab labels, and long evidence paths wrap without clipping.
 - Include a print-friendly layout and a visible note when the report is YAML-only or has unverified tenant/runtime evidence.
-- Verify that dashboard counts equal the finding cards and that every in-scope coverage row is represented. Do not invent charts or scores unsupported by the evidence.
+- The High, Medium, Low, and Advisory / future readiness tiles count finding cards of that severity. The **Evidence required** tile counts the evidence-required rows listed in Scope & evidence; those items are not finding cards. Verify both sets of counts and that every in-scope coverage row is represented. Do not invent charts or scores unsupported by the evidence.
 
 Use the template's placeholders as data slots, not as literal report content. Escape user-controlled agent names, evidence text and URLs before inserting them into HTML. If the runtime cannot create or save HTML, provide the Markdown structure below as a fallback and state that HTML generation was unavailable. Markdown is not the primary output when HTML generation is possible.
 
@@ -273,9 +274,3 @@ Offer to save the fallback as `ai-compliance-report.md` only when HTML cannot be
 ```
 
 After presenting the report, offer to implement YAML-level fixes only when appropriate authoring tools are available. Confirm tool availability and request approval before any tenant or production change.
-
-## Evaluation
-
-After editing any skill file, run the content-contract validator: `python3 scripts/validate-skill.py` (or `.\scripts\validate-skill.ps1` in PowerShell — the two scripts assert the same contract and must be kept in sync).
-
-When changing jurisdiction, applicability, severity, or evidence rules, also regression-test against `evals/cases.json`: for each case, run the skill against the described scenario (or reason through it explicitly), then check that the output satisfies every `expected` item and violates none of the `must_not` items. These checks are judgement-based rather than automated — record any deliberate behaviour change by updating the affected case.

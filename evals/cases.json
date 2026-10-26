@@ -215,6 +215,22 @@
         "Mark the EU rows N/A as if the territorial test had failed.",
         "Rate the EU rows Met or Shortfall without an established territorial test."
       ]
+    },
+    {
+      "id": "severity-calibration-by-exposure",
+      "scenario": "YAML-only. Agent 1 is an internal HR FAQ agent for UK employees, signed in with Entra ID and restricted to a security group, with SharePoint knowledge only and no actions or record access. It has useModelKnowledge: true although its instructions forbid general knowledge; contentModeration: Low; isAgentConnectable: true with no documented need; an Escalate topic still showing the template 'not configured' text while the instructions name a contact email; an unenforceable 'do not retain' instruction; and a text greeting that does not say it is AI (voice variant does), with EU use unconfirmed. Agent 2 is an anonymous public UK retail support agent with no actions or personal data requests. It has useModelKnowledge: true with no restriction to its knowledge source, contentModeration: Low, and the same template Escalate text while customers ask about refunds.",
+      "expected": [
+        "Agent 1: model knowledge contradicting the instructions is Medium.",
+        "Agent 1: Low moderation, connectability, the escalation template, and the unenforceable retention instruction are each Low.",
+        "Agent 1: the greeting without AI disclosure is Advisory.",
+        "Agent 2: model knowledge, Low moderation, and the escalation template are each Medium.",
+        "Each rating cites the audience and exposure that set it."
+      ],
+      "must_not": [
+        "Rate any of these items High.",
+        "Rate the internal agent's moderation or escalation items the same as the public agent's.",
+        "Treat the greeting item as a breach while EU use is unconfirmed."
+      ]
     }
   ]
 }

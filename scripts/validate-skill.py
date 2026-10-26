@@ -91,6 +91,10 @@ assert_contains("template", r"filterFindings", "severity tile filtering")
 assert_contains("template", r'data-target-tab="scope"', "evidence tile scope target")
 assert_contains("template", r"Regimes: \{\{REGIMES\}\}", "header regimes slot")
 assert_not_contains("template", r"<script[^>]+src=", "template external script dependency")
+assert_contains("template", r"activate = \(name, updateHash = true, filter = null\)", "tab activation resets the severity filter")
+assert_contains("template", r"data-empty-state", "empty state for a severity with no findings")
+assert_contains("skill", r"\.mcs/botdefinition\.json", "botdefinition.json inventory")
+assert_contains("skill", r"knowledge/\*\.topic\.\*\.mcs\.yml", "topic-named knowledge source inventory")
 
 evals = json.loads(text["evals"])
 cases = evals.get("cases") or []

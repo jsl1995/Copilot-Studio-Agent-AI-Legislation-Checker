@@ -144,7 +144,7 @@
         <article class="panel"><h2>Scope, assumptions &amp; evidence</h2><div class="stack">{{SCOPE_AND_EVIDENCE}}</div></article>
       </section>
       <section role="tabpanel" id="panel-findings" aria-labelledby="tab-findings" data-panel="findings" hidden>
-        <div class="panel"><h2>Findings</h2><div class="finding-list">{{FINDINGS}}</div></div>
+        <div class="panel"><h2>Findings</h2><div class="finding-list">{{FINDINGS}}</div><p class="empty-state" data-empty-state role="status" hidden>No findings to show in this view.</p></div>
       </section>
       <section role="tabpanel" id="panel-data" aria-labelledby="tab-data" data-panel="data" hidden>
         <article class="panel"><h2>Personal-data map</h2><div class="data-table-wrap">{{PERSONAL_DATA_MAP}}</div></article>
@@ -163,17 +163,19 @@
       const tabs = [...document.querySelectorAll('[role="tab"]')];
       const panels = [...document.querySelectorAll('[role="tabpanel"]')];
       const findings = [...document.querySelectorAll('.finding[data-severity]')];
+      const emptyState = document.querySelector('[data-empty-state]');
       const filterFindings = (filter) => {
         findings.forEach((finding) => { finding.hidden = Boolean(filter) && finding.dataset.severity !== filter; });
+        if (emptyState) emptyState.hidden = findings.some((finding) => !finding.hidden);
       };
-      const activate = (name, updateHash = true) => {
+      const activate = (name, updateHash = true, filter = null) => {
         tabs.forEach((tab) => {
           const selected = tab.dataset.tab === name;
           tab.setAttribute('aria-selected', String(selected));
           tab.tabIndex = selected ? 0 : -1;
         });
         panels.forEach((panel) => { panel.hidden = panel.dataset.panel !== name; });
-        if (name !== 'findings') filterFindings(null);
+        filterFindings(name === 'findings' ? filter : null);
         if (updateHash) history.replaceState(null, '', `#${name}`);
       };
       tabs.forEach((tab, index) => {
@@ -187,8 +189,7 @@
         });
       });
       document.querySelectorAll('[data-target-tab]').forEach((tile) => tile.addEventListener('click', () => {
-        filterFindings(tile.dataset.filter || null);
-        activate(tile.dataset.targetTab);
+        activate(tile.dataset.targetTab, true, tile.dataset.filter || null);
         document.getElementById('panel-' + tile.dataset.targetTab)?.scrollIntoView({ block: 'start' });
       }));
       const initial = location.hash.slice(1);

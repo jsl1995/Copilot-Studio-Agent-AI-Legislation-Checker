@@ -87,6 +87,10 @@ Assert-Contains $template '@media print' 'template print layout'
 Assert-Contains $template 'filterFindings' 'severity tile filtering'
 Assert-Contains $template 'data-target-tab="scope"' 'evidence tile scope target'
 Assert-Contains $template 'Regimes: {{REGIMES}}' 'header regimes slot'
+Assert-Contains $template 'activate = \(name, updateHash = true, filter = null\)' 'tab activation resets the severity filter'
+Assert-Contains $template 'data-empty-state' 'empty state for a severity with no findings'
+Assert-Contains $skill '\.mcs/botdefinition\.json' 'botdefinition.json inventory'
+Assert-Contains $skill 'knowledge/\*\.topic\.\*\.mcs\.yml' 'topic-named knowledge source inventory'
 Assert-NotContains $template '<script[^>]+src=' 'template external script dependency'
 
 if ($null -eq $evals.cases -or $evals.cases.Count -lt 9) {

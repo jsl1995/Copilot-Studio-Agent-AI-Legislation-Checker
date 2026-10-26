@@ -28,7 +28,8 @@ Inventory the source evidence:
 | `trigger/*.mcs.yml` / `*.mcs.yaml` | Event triggers and non-conversational invocation paths |
 | `variables/*.mcs.yml` / `*.mcs.yaml` (older layouts) | Declared and persisted data fields |
 | `connectionreferences.mcs.yml` / `.yaml`, `.mcs/conn.json` | Connector footprint and declared data-flow destinations |
-| `knowledge/` files (for example `knowledge/files/*.yaml`) | Grounding scope, source sensitivity, copyright and access implications |
+| `knowledge/` files (for example `knowledge/files/*.yaml`, `knowledge/*.knowledge.mcs.yml`, and `knowledge/*.topic.*.mcs.yml` files whose `kind` is `KnowledgeSourceConfiguration`) | Grounding scope, source sensitivity, copyright and access implications; duplicate or unlisted sources compared with the instructions |
+| `.mcs/botdefinition.json` | Component inventory and state (active or inactive), publish metadata |
 
 A missing folder from one layout generation (for example no `variables/` in a current clone, or no `workflows/` in an older one) is a layout difference, not an evidence gap.
 

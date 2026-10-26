@@ -65,6 +65,7 @@ Same core structure as EU GDPR. Key AI-specific points:
 | DPIA (Art 35; DPA 2018 s.64 for law-enforcement processing) | Apply the likely-high-risk test and current ICO mandatory list; do not presume every AI system requires one — organisational |
 | Data subject rights (Arts 15–22) | Agent routes "delete/see my data" requests correctly |
 | Processors (Art 28) | Microsoft DPA, environment data residency — organisational |
+| Representative (UK GDPR Art 27) | Controller or processor with no UK establishment and in scope under UK GDPR Art 3(2) must designate a UK representative, with the same occasional-processing and public-authority exemptions as the EU text. Assess separately from any EU representative — organisational evidence |
 | Special category data (Art 9; DPA 2018 Sch 1) | Any collected or likely volunteered? Handling rules present? |
 
 ## 3. Other UK statutes relevant to a customer-facing agent

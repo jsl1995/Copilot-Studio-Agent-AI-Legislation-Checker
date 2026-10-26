@@ -88,6 +88,7 @@ Applies to controllers/processors outside the EU when **offering goods or servic
 | DPIA (Art 35) | Apply the "likely to result in a high risk" test, regulator lists, and relevant criteria. Innovative technology is a risk indicator, not a universal trigger by itself — organisational evidence |
 | Data subject rights (Arts 15–22) | Agent can route "delete/see my data" requests correctly |
 | Processors (Art 28) | Microsoft DPA, environment data residency — organisational |
+| Representative (Art 27) | Controller or processor with no EU establishment and in scope under Art 3(2) must designate an EU representative in writing, unless processing is occasional, excludes large-scale Art 9/10 data and is unlikely to result in risk, or it is a public authority. The representative is named in the Art 13/14 notice — organisational evidence |
 | Special category data (Art 9) | Any collected or likely volunteered? Handling rules present? |
 
 ## 3. Consumer & accessibility law

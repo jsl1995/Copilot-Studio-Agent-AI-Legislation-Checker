@@ -138,6 +138,57 @@
         "Depend on a CDN, remote font, external JavaScript bundle, or colour alone to communicate severity.",
         "Hide the disclaimer, findings, or evidence limitations behind a hover-only interaction."
       ]
+    },
+    {
+      "id": "unattended-no-jurisdiction-facts",
+      "scenario": "The assessment runs unattended, so nobody can answer the Step 1 questions. The facts are: a retailer's public website chatbot answering in English that looks up order status from an order number and email address. Establishment and user locations are unknown.",
+      "expected": [
+        "Record the unanswered Step 1 facts as open evidence requests and mark jurisdiction as not established.",
+        "Show EU AI Act, EU GDPR, and UK regimes as conditional with the test that would trigger each.",
+        "Still rate jurisdiction-independent technical controls observable in the YAML."
+      ],
+      "must_not": [
+        "Assume UK or EU law applies from the English language or public reachability.",
+        "Severity-rate a legal shortfall whose applicability depends on the unanswered facts."
+      ]
+    },
+    {
+      "id": "evidence-required-tile-count",
+      "scenario": "A YAML-only assessment produces 1 High and 2 Low source findings and 6 coverage rows marked tenant/runtime or organisational evidence required.",
+      "expected": [
+        "Show tiles High 1, Medium 0, Low 2, Advisory 0, Evidence required 6.",
+        "Render exactly 3 finding cards.",
+        "List the 6 evidence-required items in Scope & evidence and the coverage matrix."
+      ],
+      "must_not": [
+        "Render evidence-required items as severity-rated finding cards.",
+        "Add evidence-required items to the severity tile totals."
+      ]
+    },
+    {
+      "id": "article-50-self-declared-deployer",
+      "scenario": "After 2 August 2026, an EU insurer publishes a Copilot Studio agent on its own site under its own brand, styled as 'Sam from the claims team' with no AI disclosure. Its governance note says it is only a deployer and Microsoft is the provider.",
+      "expected": [
+        "Test the provider definition against the facts (system put into service under the insurer's own name) instead of accepting the label.",
+        "Assess Article 50(1) as in-force binding law and the obvious-interaction exception against the human persona.",
+        "State the role conclusion and flag it for legal confirmation."
+      ],
+      "must_not": [
+        "Mark Article 50(1) N/A solely because the organisation calls itself a deployer."
+      ]
+    },
+    {
+      "id": "non-eu-non-uk-controller-representatives",
+      "scenario": "A US company with no EU or UK establishment intentionally offers its Copilot Studio support agent to consumers in Ireland and the UK and collects names, email addresses, and order details.",
+      "expected": [
+        "Apply EU GDPR Article 3(2) and UK GDPR Article 3(2) separately.",
+        "Identify the EU Article 27 and UK Article 27 representative duties and their exemptions, citing the stored references.",
+        "Record representative appointments and transfer mechanisms as organisational evidence required until the company confirms a control is missing."
+      ],
+      "must_not": [
+        "Treat a single EU representative as covering the UK.",
+        "Rate a missing representative as a confirmed breach before the organisation confirms the facts."
+      ]
     }
   ]
 }

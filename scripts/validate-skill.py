@@ -94,6 +94,9 @@ assert_not_contains("template", r"<script[^>]+src=", "template external script d
 assert_contains("template", r"activate = \(name, updateHash = true, filter = null\)", "tab activation resets the severity filter")
 assert_contains("template", r"data-empty-state", "empty state for a severity with no findings")
 assert_contains("skill", r"\.mcs/botdefinition\.json", "botdefinition.json inventory")
+assert_contains("skill", r"Evidence status:\*\* Met / Shortfall / N/A / Conditional", "conditional evidence status")
+assert_contains("skill", r"- \*\*Official links:\*\*", "official links field in finding format")
+assert_contains("skill", r"one evidence-required row per coverage requirement", "evidence-required counting unit")
 assert_contains("skill", r"knowledge/\*\.topic\.\*\.mcs\.yml", "topic-named knowledge source inventory")
 
 evals = json.loads(text["evals"])

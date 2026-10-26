@@ -107,13 +107,17 @@ Assess the five cross-sector AI principles as non-statutory regulatory guidance 
 For every requirement, record:
 
 - **Basis type:** Binding law / Future obligation / Regulatory guidance / Technical control
-- **Applicability:** why the rule applies, does not apply, or remains uncertain
+- **Applicability:** why the rule applies, does not apply, or depends on facts not yet established
 - **Effective status:** in force / future dated / transitional / unverified
-- **Evidence status:** Met / Shortfall / N/A / Tenant-runtime evidence required / Organisational evidence required
+- **Evidence status:** Met / Shortfall / N/A / Conditional / Tenant-runtime evidence required / Organisational evidence required
+
+Use **Conditional** when the requirement's territorial, role, or date test depends on facts that are not established. The row names the test and the missing facts and is not rated. If a finding is raised about a Conditional row, the finding's Applicability field states the condition and the row links to the finding.
 
 Never rate a requirement as Met without evidence. Never turn missing external evidence into a confirmed source-code defect.
 
-### A - EU AI Act (only when its territorial test is met)
+**Evidence-required rows:** the report contains one evidence-required row per coverage requirement (A1-F6) whose evidence status is Tenant-runtime or Organisational evidence required. Each row gives the requirement ID, every piece of evidence needed for that requirement, and the owner. Open Step 1 facts and Conditional rows are listed in Scope & evidence under their own headings and are not evidence-required rows.
+
+### A - EU AI Act (assess when its territorial test is met; Conditional when it depends on unestablished facts; N/A when it is not met)
 
 - A1. Article 5 prohibited practices - in force; assess relevant categories
 - A2. Article 6 and Annex I/III risk classification - document use-case facts, exclusions, and effective dates
@@ -197,8 +201,9 @@ Use this finding format:
 ```markdown
 ### <ID> - <High/Medium/Low/Advisory> - <Title>
 - **Basis type:** <Binding law / Future obligation / Regulatory guidance / Technical control>
-- **Basis:** <instrument and article/section, official guidance, or named technical standard with official link>
-- **Applicability:** <facts and test establishing why it applies>
+- **Basis:** <instrument and article/section, official guidance, or named technical standard>
+- **Official links:** <official source for each basis: EUR-Lex, legislation.gov.uk, regulator guidance, or Microsoft Learn>
+- **Applicability:** <facts and test establishing why it applies, or the condition it depends on>
 - **Effective status:** <in force / future dated / transitional / verified on date>
 - **Evidence:** <file:line for present evidence; for an absence, list files and search/control checked; for external controls, state evidence required>
 - **Remediation:** <concrete and proportionate fix>
@@ -223,7 +228,7 @@ Build the first viewport as a quiet, information-dense Fluent UI-style dashboard
 - Render each finding as a semantic `article` or card with its ID, severity, basis type, applicability, effective status, evidence, remediation, owner, and official links. Use text labels in addition to colour.
 - Keep the coverage matrix searchable or horizontally scrollable on small screens. Ensure tables, cards, tab labels, and long evidence paths wrap without clipping.
 - Include a print-friendly layout and a visible note when the report is YAML-only or has unverified tenant/runtime evidence.
-- The High, Medium, Low, and Advisory / future readiness tiles count finding cards of that severity. The **Evidence required** tile counts the evidence-required rows listed in Scope & evidence; those items are not finding cards. Verify both sets of counts and that every in-scope coverage row is represented. Do not invent charts or scores unsupported by the evidence.
+- The High, Medium, Low, and Advisory / future readiness tiles count finding cards of that severity. The **Evidence required** tile counts the evidence-required rows listed in Scope & evidence (one per coverage requirement, as defined in Step 3); those items are not finding cards. Verify both sets of counts and that every in-scope coverage row is represented. Do not invent charts or scores unsupported by the evidence.
 
 Use the template's placeholders as data slots, not as literal report content. Escape user-controlled agent names, evidence text and URLs before inserting them into HTML. If the runtime cannot create or save HTML, provide the Markdown structure below as a fallback and state that HTML generation was unavailable. Markdown is not the primary output when HTML generation is possible.
 
@@ -236,7 +241,7 @@ The generated file must contain:
 3. A findings data set whose counts drive the tiles, with no severity inferred from colour alone.
 4. The standard disclaimer in the header or executive-summary panel.
 5. Official source links near each legal or guidance basis.
-6. A coverage matrix containing every applicable A-F requirement, including N/A and evidence-required rows.
+6. A coverage matrix containing every A-F requirement, including N/A, Conditional, and evidence-required rows.
 
 ## Markdown fallback structure
 

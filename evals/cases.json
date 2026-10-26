@@ -189,6 +189,32 @@
         "Treat a single EU representative as covering the UK.",
         "Rate a missing representative as a confirmed breach before the organisation confirms the facts."
       ]
+    },
+    {
+      "id": "evidence-required-row-unit",
+      "scenario": "A YAML-only assessment of a UK-only agent leaves transcript saving and transcript retention unverified (both F1), lawful basis (C1), DPIA screening (C5), and retention schedule (C6) unverified, and the privacy notice unverified at both the host page (C3) and the channel (F2).",
+      "expected": [
+        "Create one evidence-required row per coverage requirement: F1, C1, C5, C6, C3, and F2.",
+        "List both transcript evidence items inside the single F1 row.",
+        "Show 6 on the Evidence required tile."
+      ],
+      "must_not": [
+        "Split one requirement into several evidence-required rows.",
+        "Merge different requirements into one evidence-required row.",
+        "Count open Step 1 facts or Conditional rows as evidence-required rows."
+      ]
+    },
+    {
+      "id": "conditional-territorial-rows",
+      "scenario": "An internal agent's instructions say users are UK employees. No facts confirm whether any EU staff use it or whether output is used in the EU.",
+      "expected": [
+        "Mark EU AI Act and EU GDPR coverage rows Conditional, naming the territorial test and the missing facts.",
+        "List the open territorial facts in Scope & evidence under their own heading."
+      ],
+      "must_not": [
+        "Mark the EU rows N/A as if the territorial test had failed.",
+        "Rate the EU rows Met or Shortfall without an established territorial test."
+      ]
     }
   ]
 }
